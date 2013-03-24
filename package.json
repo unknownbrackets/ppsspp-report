@@ -26,7 +26,8 @@
 
   "dependencies": {
     "mysql": ">= 2.0.0-alpha7",
-    "async": ">= 0.2.0"
+    "async": ">= 0.2.0",
+    "plates": "0.4.x"
   },
   "devDependencies": {},
   "bundleDependencies": [],

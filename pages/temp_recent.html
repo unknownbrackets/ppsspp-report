@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Quick listing</title>
+		<style type="text/css">
+			html, body
+			{
+				background: black;
+				color: #bbb;
+				font: 15px/20px 'Droid Sans', sans-serif;
+			}
+
+			table
+			{
+				width: 100%;
+			}
+
+			tr:nth-child(even)
+			{
+				background: #444;
+			}
+
+			th, .title, .version
+			{
+				text-align: center;
+			}
+
+			td
+			{
+				padding: 4px;
+			}
+
+			h1
+			{
+				color: #fff;
+				font-size: 30px;
+				font-weight: normal;
+				line-height: 40px;
+				margin: 0;
+				text-rendering: optimizelegibility;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Quick message report</h1>
+		<p>Forgive the ugly, just slapped this in really quick.</p>
+
+		<table>
+			<tr>
+				<th>Game title</th>
+				<th>Version</th>
+				<th>Message</th>
+			</tr>
+			<tr class="messages">
+				<td class="title" title="id_game"></td>
+				<td class="version"></td>
+				<td class="message"></td>
+			</tr>
+		</table>
+	</body>
+</html>
