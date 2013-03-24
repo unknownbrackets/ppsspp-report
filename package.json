@@ -25,6 +25,8 @@
   },
 
   "dependencies": {
+    "mysql": ">= 2.0.0-alpha7",
+    "async": ">= 0.2.0"
   },
   "devDependencies": {},
   "bundleDependencies": [],

@@ -3,6 +3,8 @@
 var express = require('express');
 var fs      = require('fs');
 
+var report  = require('./lib/report/index');
+
 
 /**
  *  Define the sample application.
@@ -95,20 +97,16 @@ var SampleApp = function() {
     self.createRoutes = function() {
         self.routes = { };
 
-        // Routes for /health, /asciimo and /
         self.routes['/health'] = function(req, res) {
             res.send('1');
         };
 
-        self.routes['/asciimo'] = function(req, res) {
-            var link = "http://i.imgur.com/kmbjB.png";
-            res.send("<html><body><img src='" + link + "'></body></html>");
-        };
-
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
-            res.send(self.cache_get('index.html') );
+            res.send(self.cache_get('index.html'));
         };
+
+        report.addRoutes(self);
     };
 
 
@@ -117,10 +115,11 @@ var SampleApp = function() {
      *  the handlers.
      */
     self.initializeServer = function() {
-        self.createRoutes();
-        self.app = express.createServer();
+        self.app = express();
+        self.app.use(express.bodyParser());
 
         //  Add handlers for the app (from the routes).
+        self.createRoutes();
         for (var r in self.routes) {
             self.app.get(r, self.routes[r]);
         }
