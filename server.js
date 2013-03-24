@@ -115,7 +115,7 @@ var SampleApp = function() {
      *  the handlers.
      */
     self.initializeServer = function() {
-        self.app = express();
+        self.app = express.createServer();
         self.app.use(express.bodyParser());
 
         //  Add handlers for the app (from the routes).
