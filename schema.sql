@@ -42,3 +42,7 @@ CREATE TABLE report_message_versions (
 	PRIMARY KEY (id_msg, id_version),
 	KEY `id_version-latest_report` (id_version, latest_report)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE report_messages
+CHANGE COLUMN formatted_message formatted_message varchar(4096) NOT NULL DEFAULT '';
