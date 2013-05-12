@@ -46,3 +46,28 @@ CREATE TABLE report_message_versions (
 
 ALTER TABLE report_messages
 CHANGE COLUMN formatted_message formatted_message varchar(4096) NOT NULL DEFAULT '';
+
+
+CREATE TABLE gpus (
+	id_gpu mediumint(8) unsigned NOT NULL auto_increment,
+	short_desc varchar(96) NOT NULL DEFAULT '',
+	long_desc varchar(16384) NOT NULL DEFAULT '',
+	hash binary(20) NOT NULL,
+	PRIMARY KEY (id_gpu),
+	KEY hash (hash)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE cpus (
+	id_cpu mediumint(8) unsigned NOT NULL auto_increment,
+	summary varchar(1024) NOT NULL DEFAULT '',
+	hash binary(20) NOT NULL,
+	PRIMARY KEY (id_cpu),
+	KEY hash (hash)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE platforms (
+	id_platform mediumint(8) unsigned NOT NULL auto_increment,
+	title varchar(32) CHARACTER SET latin1 NOT NULL,
+	PRIMARY KEY (id_platform),
+	UNIQUE KEY title (title)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
