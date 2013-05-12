@@ -71,3 +71,34 @@ CREATE TABLE platforms (
 	PRIMARY KEY (id_platform),
 	UNIQUE KEY title (title)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE report_message_gpus (
+	id_msg int(10) unsigned NOT NULL,
+	id_gpu mediumint(8) unsigned NOT NULL,
+	first_report datetime NOT NULL,
+	latest_report datetime NOT NULL,
+	hits smallint(5) unsigned NOT NULL DEFAULT 1,
+	PRIMARY KEY (id_msg, id_gpu),
+	KEY `id_gpu-latest_report` (id_gpu, latest_report)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE report_message_cpus (
+	id_msg int(10) unsigned NOT NULL,
+	id_cpu mediumint(8) unsigned NOT NULL,
+	first_report datetime NOT NULL,
+	latest_report datetime NOT NULL,
+	hits smallint(5) unsigned NOT NULL DEFAULT 1,
+	PRIMARY KEY (id_msg, id_cpu),
+	KEY `id_cpu-latest_report` (id_cpu, latest_report)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE report_message_platforms (
+	id_msg int(10) unsigned NOT NULL,
+	id_platform mediumint(8) unsigned NOT NULL,
+	first_report datetime NOT NULL,
+	latest_report datetime NOT NULL,
+	hits smallint(5) unsigned NOT NULL DEFAULT 1,
+	PRIMARY KEY (id_msg, id_platform),
+	KEY `id_platform-latest_report` (id_platform, latest_report)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
