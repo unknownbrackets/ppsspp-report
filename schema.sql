@@ -102,3 +102,9 @@ CREATE TABLE report_message_platforms (
 	PRIMARY KEY (id_msg, id_platform),
 	KEY `id_platform-latest_report` (id_platform, latest_report)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE report_messages
+ADD COLUMN status enum('new', 'resolved', 'reoccurring') NOT NULL DEFAULT 'new',
+ADD COLUMN resolved_version_value int(10) unsigned NOT NULL DEFAULT 0,
+ADD INDEX status (status);
