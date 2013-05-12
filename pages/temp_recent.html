@@ -52,6 +52,20 @@
 		{
 			max-width: 60ex;
 		}
+
+		.message a
+		{
+			display: block;
+			max-height: 15ex;
+			overflow: hidden;
+			white-space: pre-wrap;
+			transition: max-height 0.25s;
+		}
+
+		tr:hover .message a
+		{
+			max-height: 400px;
+		}
 	</style>
 </head>
 <body>
