@@ -35,26 +35,26 @@ var SampleApp = function() {
         };
     };
 
+	// Local cache for static content.
+	self.staticCache = {};
+	self.preloadStatic = function ()
+	{
+		var preload = ['./pages/index.html', './pages/temp_recent.html'];
+		for (var i = 0; i < preload.length; ++i)
+		{
+			var f = preload[i];
+			self.staticCache[f] = fs.readFileSync(f);
+		}
+	};
 
-    /**
-     *  Populate the cache.
-     */
-    self.populateCache = function() {
-        if (typeof self.zcache === "undefined") {
-            self.zcache = { 'index.html': '' };
-        }
+	// Do not use on untrusted user strings.  Keys must be paths.
+    self.getStatic = function (key)
+    {
+		if (key in self.staticCache)
+			return self.staticCache[key];
 
-        //  Local cache for static content.
-        self.zcache['index.html'] = fs.readFileSync('./pages/index.html');
-        self.zcache['temp_recent.html'] = fs.readFileSync('./pages/temp_recent.html');
-    };
-
-
-    /**
-     *  Retrieve entry (content) from cache.
-     *  @param {string} key  Key identifying content to retrieve from cache.
-     */
-    self.cache_get = function(key) { return self.zcache[key]; };
+		return self.staticCache[key] = fs.readFileSync(key);
+	};
 
 
     /**
@@ -64,7 +64,7 @@ var SampleApp = function() {
      */
     self.terminator = function(sig){
         if (typeof sig === "string") {
-           console.log('%s: Received %s - terminating sample app ...',
+           console.log('%s: Received %s - terminating app ...',
                        Date(Date.now()), sig);
            process.exit(1);
         }
@@ -98,14 +98,35 @@ var SampleApp = function() {
     self.createRoutes = function() {
         self.routes = { };
 
-        self.routes['/health'] = function(req, res) {
+        self.routes['/health'] = function (req, res) {
             res.send('1');
         };
 
-        self.routes['/'] = function(req, res) {
-            res.setHeader('Content-Type', 'text/html');
-            res.send(self.cache_get('index.html'));
+        self.routes['/'] = function (req, res) {
+            res.setHeader('Content-Type', 'text/html; encoding=utf-8');
+            res.send(self.getStatic('./pages/index.html'));
         };
+
+		// TODO: It'd probably be better to serve these via nginx directly.
+
+		var cssRoute = function (req, res)
+		{
+			res.setHeader('Content-Type', 'text/css');
+			res.send(self.getStatic('.' + req.route.path));
+		};
+
+		var jsRoute = function (req, res)
+		{
+			res.setHeader('Content-Type', 'application/x-javascript');
+			res.send(self.getStatic('.' + req.route.path));
+		};
+
+		self.routes['/css/style.css'] = cssRoute;
+		self.routes['/css/style-min.css'] = cssRoute;
+
+		self.routes['/js/libs/jquery-1.7.2.min.js'] = jsRoute;
+		self.routes['/js/libs/modernizr-2.5.3-respond-1.1.0.min.js'] = jsRoute;
+		self.routes['/js/libs/bootstrap/bootstrap.min.js'] = jsRoute;
 
         report.addRoutes(self);
     };
@@ -132,7 +153,7 @@ var SampleApp = function() {
      */
     self.initialize = function() {
         self.setupVariables();
-        self.populateCache();
+        self.preloadStatic();
         self.setupTerminationHandlers();
 
         // Create the express server and routes.
