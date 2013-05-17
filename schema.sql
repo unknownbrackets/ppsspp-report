@@ -108,3 +108,10 @@ ALTER TABLE report_messages
 ADD COLUMN status enum('new', 'resolved', 'reoccurring') NOT NULL DEFAULT 'new',
 ADD COLUMN resolved_version_value int(10) unsigned NOT NULL DEFAULT 0,
 ADD INDEX status (status);
+
+
+ALTER TABLE games
+CHANGE COLUMN id_game id_game char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.';
+
+ALTER TABLE report_messages
+CHANGE COLUMN id_game id_game char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.';
