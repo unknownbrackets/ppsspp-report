@@ -53,11 +53,6 @@
 			padding: 4px;
 		}
 
-		#reporting-ini-sample
-		{
-			max-width: 60ex;
-		}
-
 		.message a
 		{
 			display: block;
@@ -114,5 +109,22 @@
 	<script>window.jQuery || document.write('<script src="/js/libs/jquery-1.7.2.min.js"><\/script>')</script>
 
 	<script src="/js/common.min.js"></script>
+
+	<script>
+		jQuery(function ($)
+		{
+			var dragstart = function (ev)
+			{
+				var selection = document.getSelection();
+				selection.removeAllRanges();
+				selection.selectAllChildren(this);
+
+				ev.preventDefault();
+			};
+
+			if (document.createRange && document.getSelection && document.getSelection().selectAllChildren)
+				$(".message-text").bind('dragstart', dragstart);
+		});
+	</script>
 </body>
 </html>
