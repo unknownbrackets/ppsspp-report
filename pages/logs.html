@@ -67,6 +67,12 @@
 		{
 			max-height: 640px;
 		}
+
+		.message-text.disabled
+		{
+			color: #BBBBBB !important;
+			text-decoration: none !important;
+		}
 	</style>
 </head>
 <body>
@@ -118,10 +124,21 @@
 				var selection = document.getSelection();
 				selection.removeAllRanges();
 				selection.selectAllChildren(this);
+
+				ev.preventDefault();
 			};
 
 			if (document.createRange && document.getSelection && document.getSelection().selectAllChildren)
-				$(".message-text").bind('dragstart', dragstart);
+				$(".message-text").bind('dblclick', dragstart);
+
+			// TODO: Do this better.
+			if (document.location.href.indexOf('/kind/') != -1)
+				$('.message-text').each(function ()
+				{
+					var $this = $(this);
+					if (this.href == document.location.href)
+						$this.removeAttr('href').addClass('disabled');
+				});
 		});
 	</script>
 </body>
