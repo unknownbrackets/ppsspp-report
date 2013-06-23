@@ -115,3 +115,6 @@ CHANGE COLUMN id_game id_game char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Wi
 
 ALTER TABLE report_messages
 CHANGE COLUMN id_game id_game char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.';
+
+ALTER TABLE versions
+ADD INDEX `title-id_version` (title, id_version);
