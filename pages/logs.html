@@ -118,8 +118,6 @@
 				var selection = document.getSelection();
 				selection.removeAllRanges();
 				selection.selectAllChildren(this);
-
-				ev.preventDefault();
 			};
 
 			if (document.createRange && document.getSelection && document.getSelection().selectAllChildren)
