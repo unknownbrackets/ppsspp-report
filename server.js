@@ -39,7 +39,7 @@ var SampleApp = function() {
 	self.staticCache = {};
 	self.preloadStatic = function ()
 	{
-		var preload = ['./pages/index.html', './pages/logs.html'];
+		var preload = ['./pages/index.html', './pages/logs.html', './pages/errors/404.html', './pages/errors/500.html'];
 		for (var i = 0; i < preload.length; ++i)
 		{
 			var f = preload[i];
@@ -121,12 +121,26 @@ var SampleApp = function() {
 			res.send(self.getStatic('.' + req.route.path));
 		};
 
+		var errorRoute = function (req, res)
+		{
+			res.status(404);
+			if (req.accepts('html'))
+			{
+				res.end(String(self.getStatic('./pages/errors/404.html')));
+				return;
+			}
+
+			res.type('txt').end('404 Not Found');
+		};
+
 		self.routes['/css/style.css'] = cssRoute;
 		self.routes['/css/style.min.css'] = cssRoute;
 
 		self.routes['/js/libs/jquery-1.7.2.min.js'] = jsRoute;
 		self.routes['/js/libs/modernizr-2.5.3-respond-1.1.0.min.js'] = jsRoute;
 		self.routes['/js/common.min.js'] = jsRoute;
+
+		self.routes['*'] = errorRoute;
 
         report.addRoutes(self);
     };
