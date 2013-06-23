@@ -39,7 +39,7 @@ var SampleApp = function() {
 	self.staticCache = {};
 	self.preloadStatic = function ()
 	{
-		var preload = ['./pages/index.html', './pages/temp_recent.html'];
+		var preload = ['./pages/index.html', './pages/logs.html'];
 		for (var i = 0; i < preload.length; ++i)
 		{
 			var f = preload[i];
