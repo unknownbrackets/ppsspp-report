@@ -454,3 +454,45 @@ delimiter ;
 
 ALTER TABLE report_messages
 ADD INDEX id_game (id_game);
+
+
+delimiter //
+
+CREATE PROCEDURE report_message_hit (
+	a_id_msg int(10) unsigned,
+	a_id_version int(10) unsigned,
+	a_id_gpu mediumint(8) unsigned,
+	a_id_cpu mediumint(8) unsigned,
+	a_id_platform mediumint(8) unsigned
+)
+BEGIN
+	INSERT INTO report_message_versions
+		(id_msg, id_version, first_report, latest_report)
+	VALUES (a_id_msg, a_id_version, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = hits + 1;
+
+	INSERT INTO report_message_gpus
+		(id_msg, id_gpu, first_report, latest_report)
+	VALUES (a_id_msg, a_id_gpu, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = hits + 1;
+
+	INSERT INTO report_message_cpus
+		(id_msg, id_cpu, first_report, latest_report)
+	VALUES (a_id_msg, a_id_cpu, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = hits + 1;
+
+	INSERT INTO report_message_platforms
+		(id_msg, id_platform, first_report, latest_report)
+	VALUES (a_id_msg, a_id_platform, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = hits + 1;
+END//
+
+delimiter ;
