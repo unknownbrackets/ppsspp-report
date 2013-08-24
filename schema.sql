@@ -289,7 +289,7 @@ END//
 
 CREATE PROCEDURE create_report_message (
 	a_id_msg_kind int(10) unsigned,
-	a_id_game char(14),
+	a_id_game char(18) CHARACTER SET latin1,
 	a_formatted_message varchar(1024),
 	a_id_version int(10) unsigned
 )
@@ -390,7 +390,7 @@ BEGIN
 END//
 
 CREATE FUNCTION fetch_game_exists_ (
-	a_id_game char(14)
+	a_id_game char(18) CHARACTER SET latin1
 ) RETURNS tinyint(1) READS SQL DATA
 BEGIN
 	RETURN EXISTS (
@@ -402,7 +402,7 @@ BEGIN
 END//
 
 CREATE PROCEDURE create_game (
-	a_id_game char(14),
+	a_id_game char(18) CHARACTER SET latin1,
 	a_title varchar(255)
 )
 BEGIN
