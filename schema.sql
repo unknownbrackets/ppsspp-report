@@ -450,3 +450,7 @@ BEGIN
 END//
 
 delimiter ;
+
+
+ALTER TABLE report_messages
+ADD INDEX id_game (id_game);
