@@ -1,0 +1,96 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>		<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>		<html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>PPSSPP Reporting: Reported Messages</title>
+	<link rel="stylesheet" href="/css/style.min.css">
+	<script src="/js/libs/modernizr-2.5.3-respond-1.1.0.min.js"></script>
+	<style type="text/css">
+		#reporting-logs-table
+		{
+			width: 100%;
+			margin: 4ex 0;
+		}
+
+		#reporting-logs-table tr:nth-child(even)
+		{
+			background: #444;
+		}
+
+		th
+		{
+			white-space: nowrap;
+		}
+
+		th, .title, .version, .latest_report-text
+		{
+			text-align: center;
+		}
+
+		.version, .latest_report-text
+		{
+			white-space: nowrap;
+		}
+
+		#reporting-logs-table a
+		{
+			color: #bbb;
+			text-decoration: none;
+		}
+
+		#reporting-logs-table a:hover
+		{
+			color: white;
+			text-decoration: underline;
+		}
+
+		#reporting-logs-table td
+		{
+			padding: 4px;
+		}
+
+		.games-text
+		{
+			text-align: right;
+		}
+	</style>
+</head>
+<body>
+	<div class="navbar navbar-fixed-top"><div class="navbar-inner"><div class="container">
+		<a class="brand" href="//www.ppsspp.org/index.html">PPSSPP</a>
+		<div class="nav">
+			<ul class="nav">
+				<li><a href="/">Reporting Home</a></li>
+				<li class="active"><a href="/logs">Logs</a></li>
+			</ul>
+		</div>
+	</div></div></div>
+	<div class="container report-ppsspp-org" id="page-reporting-logs">
+		<h2>Reported Messages</h2>
+
+		<table id="reporting-logs-table">
+			<tr>
+				<th>Message</th>
+				<th># of games</th>
+			</tr>
+			<tr class="kinds">
+				<td class="message"><a href="" class="message-text"></a></td>
+				<td class="games-text"></td>
+			</tr>
+		</table>
+
+		<footer>
+			 <p>&copy; PPSSPP project 2012. PSP is a trademark of Sony, Inc.</p>
+		</footer>
+	</div>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="/js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+
+	<script src="/js/common.min.js"></script>
+</body>
+</html>
