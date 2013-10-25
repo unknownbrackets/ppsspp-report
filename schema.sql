@@ -136,9 +136,9 @@ BEGIN
 	UPDATE report_messages
 	SET status = 'resolved',
 		resolved_version_value = a_version_value
-	WHERE status IN ('new', 'reocurring')
-	   AND (resolved_version_value <= a_version_value OR status = 'new')
-	   AND id_msg_kind = a_id_msg_kind;
+	WHERE status IN ('new', 'reoccurring')
+		AND (resolved_version_value <= a_version_value OR status = 'new')
+		AND id_msg_kind = a_id_msg_kind;
 END//
 
 CREATE PROCEDURE resolve_message_id (
@@ -156,9 +156,9 @@ BEGIN
 	UPDATE report_messages
 	SET status = 'resolved',
 		resolved_version_value = a_version_value
-	WHERE status IN ('new', 'reocurring')
-	   AND (resolved_version_value <= a_version_value OR status = 'new')
-	   AND id_msg = a_id_msg;
+	WHERE status IN ('new', 'reoccurring')
+		AND (resolved_version_value <= a_version_value OR status = 'new')
+		AND id_msg = a_id_msg;
 END//
 
 CREATE PROCEDURE resolve_message_formatted (
@@ -177,11 +177,11 @@ BEGIN
 	UPDATE report_messages
 	SET status = 'resolved',
 		resolved_version_value = a_version_value
-	WHERE status IN ('new', 'reocurring')
-	   AND (resolved_version_value <= a_version_value OR status = 'new')
-	   AND id_msg_kind = a_id_msg_kind
-	   AND formatted_hash = UNHEX(SHA1(a_formatted_message))
-	   AND formatted_message = a_formatted_message;
+	WHERE status IN ('new', 'reoccurring')
+		AND (resolved_version_value <= a_version_value OR status = 'new')
+		AND id_msg_kind = a_id_msg_kind
+		AND formatted_hash = UNHEX(SHA1(a_formatted_message))
+		AND formatted_message = a_formatted_message;
 END//
 
 CREATE FUNCTION fetch_cpu_ (
@@ -496,3 +496,38 @@ BEGIN
 END//
 
 delimiter ;
+
+
+ALTER TABLE versions
+ADD INDEX `value-id_version` (value, id_version);
+
+delimiter //
+CREATE PROCEDURE resolve_message_kind_before (
+	a_id_msg_kind int(10) unsigned,
+	a_version_value int(10) unsigned
+)
+BEGIN
+	UPDATE report_messages
+	SET status = 'resolved',
+		resolved_version_value = a_version_value
+	WHERE status IN ('new', 'reoccurring')
+		AND (resolved_version_value <= a_version_value OR status = 'new')
+		AND id_msg_kind = a_id_msg_kind
+		AND id_msg NOT IN (
+				SELECT id_msg
+				FROM report_message_versions
+					NATURAL JOIN versions
+				WHERE value > a_version_value
+			);
+END//
+
+delimiter ;
+
+
+CREATE TABLE settings (
+	min_version_value int(10) unsigned NOT NULL DEFAULT 0
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+INSERT INTO settings
+	(min_version_value)
+VALUES (0);
