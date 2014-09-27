@@ -463,7 +463,8 @@ CREATE PROCEDURE report_message_hit (
 	a_id_version int(10) unsigned,
 	a_id_gpu mediumint(8) unsigned,
 	a_id_cpu mediumint(8) unsigned,
-	a_id_platform mediumint(8) unsigned
+	a_id_platform mediumint(8) unsigned,
+	a_id_config int(10) unsigned
 )
 BEGIN
 	INSERT INTO report_message_versions
@@ -490,6 +491,13 @@ BEGIN
 	INSERT INTO report_message_platforms
 		(id_msg, id_platform, first_report, latest_report)
 	VALUES (a_id_msg, a_id_platform, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = hits + 1;
+
+	INSERT INTO report_message_configs
+		(id_msg, id_config, first_report, latest_report)
+	VALUES (a_id_msg, a_id_config, NOW(), NOW())
 		ON DUPLICATE KEY UPDATE
 			latest_report = NOW(),
 			hits = hits + 1;
@@ -531,3 +539,107 @@ CREATE TABLE settings (
 INSERT INTO settings
 	(min_version_value)
 VALUES (0);
+
+
+CREATE TABLE configs (
+	id_config int(10) unsigned NOT NULL auto_increment,
+	first_report datetime NOT NULL,
+	hash binary(20) NOT NULL,
+	PRIMARY KEY (id_config),
+	UNIQUE KEY (hash)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE config_settings (
+	id_config_setting mediumint(8) unsigned NOT NULL auto_increment,
+	title varchar(64) CHARACTER SET latin1 NOT NULL,
+	PRIMARY KEY (id_config_setting),
+	UNIQUE KEY (title)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE config_values (
+	id_config int(10) unsigned NOT NULL,
+	id_config_setting mediumint(8) unsigned NOT NULL,
+	value varchar(255) CHARACTER SET latin1 NOT NULL,
+	PRIMARY KEY (id_config, id_config_setting)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE report_message_configs (
+	id_msg int(10) unsigned NOT NULL,
+	id_config int(10) unsigned NOT NULL,
+	first_report datetime NOT NULL,
+	latest_report datetime NOT NULL,
+	hits smallint(5) unsigned NOT NULL DEFAULT 1,
+	PRIMARY KEY (id_msg, id_config),
+	KEY `id_config-latest_report` (id_config, latest_report)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+delimiter //
+CREATE FUNCTION fetch_config_ (
+	a_hash binary(20)
+) RETURNS int(10) unsigned READS SQL DATA
+BEGIN
+	RETURN (
+		SELECT id_config
+		FROM configs
+		WHERE hash = a_hash
+		LIMIT 1
+	);
+END//
+
+CREATE FUNCTION fetch_config_setting_ (
+	a_key varchar(64) CHARACTER SET latin1
+) RETURNS mediumint(8) unsigned READS SQL DATA
+BEGIN
+	RETURN (
+		SELECT id_config_setting
+		FROM config_settings
+		WHERE title = a_key
+		LIMIT 1
+	);
+END//
+
+CREATE PROCEDURE create_config (
+	a_settings varchar(4095)
+)
+BEGIN
+	DECLARE v_id_config int(10) unsigned;
+	DECLARE v_hash binary(20) DEFAULT UNHEX(SHA1(a_settings));
+
+	SET v_id_config = fetch_config_(v_hash);
+	IF v_id_config IS NULL THEN
+		INSERT IGNORE INTO configs
+			(hash, first_report)
+		VALUES (v_hash, NOW());
+
+		-- Re-select in case someone else inserted.
+		SET v_id_config = fetch_config_(v_hash);
+	END IF;
+
+	SELECT v_id_config;
+END//
+
+CREATE PROCEDURE set_config_value (
+	a_id_config int(10) unsigned,
+	a_key varchar(64) CHARACTER SET latin1,
+	a_value varchar(255) CHARACTER SET latin1
+)
+BEGIN
+	DECLARE v_id_config_setting mediumint(8) unsigned;
+
+	SET v_id_config_setting = fetch_config_setting_(a_key);
+	IF v_id_config_setting IS NULL THEN
+		INSERT IGNORE INTO config_settings
+			(title)
+		VALUES (a_key);
+
+		-- Re-select in case someone else inserted.
+		SET v_id_config_setting = fetch_config_setting_(a_key);
+	END IF;
+
+	INSERT IGNORE INTO config_values
+		(id_config, id_config_setting, value)
+	VALUES (a_id_config, v_id_config_setting, a_value);
+
+	SELECT v_id_config_setting;
+END//
+delimiter ;
