@@ -1,24 +1,14 @@
 #!/bin/env node
-//  OpenShift sample Node application
 var express = require('express');
 var bodyParser = require('body-parser')
 var fs = require('fs');
 
-var logs  = require('./lib/logs/index');
+var logs = require('./lib/logs/index');
+var compat = require('./lib/compat/index');
 
-
-/**
- *  Define the sample application.
- */
-var SampleApp = function() {
-
-    //  Scope.
+var ReportApp = function() {
     var self = this;
 
-
-    /*  ================================================================  */
-    /*  Helper functions.                                                 */
-    /*  ================================================================  */
 
     /**
      *  Set up server IP address and port # using env variables/defaults.
@@ -89,10 +79,6 @@ var SampleApp = function() {
     };
 
 
-    /*  ================================================================  */
-    /*  App server functions (main app logic here).                       */
-    /*  ================================================================  */
-
     /**
      *  Create the routing table entries + handlers for the application.
      */
@@ -101,11 +87,6 @@ var SampleApp = function() {
 
         self.routes['/health'] = function (req, res) {
             res.send('1');
-        };
-
-        self.routes['/'] = function (req, res) {
-            res.setHeader('Content-Type', 'text/html; encoding=utf-8');
-            res.send(self.getStatic('./pages/index.html'));
         };
 
 		// TODO: It'd probably be better to serve these via nginx directly.
@@ -143,8 +124,9 @@ var SampleApp = function() {
 
 		self.routes['*'] = errorRoute;
 
-        logs.addRoutes(self);
-    };
+		logs.addRoutes(self);
+		compat.addRoutes(self);
+	};
 
 
     /**
@@ -184,18 +166,17 @@ var SampleApp = function() {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, self.ipaddress, function() {
             console.log('%s: Node server started on %s:%d ...',
-                        Date(Date.now() ), self.ipaddress, self.port);
+                        Date(Date.now()), self.ipaddress, self.port);
         });
     };
 
-};   /*  Sample Application.  */
-
+};
 
 
 /**
  *  main():  Main code.
  */
-var zapp = new SampleApp();
+var zapp = new ReportApp();
 zapp.initialize();
 zapp.start();
 
