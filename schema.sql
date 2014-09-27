@@ -27,7 +27,7 @@ CREATE TABLE report_messages (
 	id_msg int(10) unsigned NOT NULL auto_increment,
 	id_msg_kind int(10) unsigned NOT NULL,
 	id_game char(14) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.',
-	formatted_message varchar(1024) NOT NULL DEFAULT '',
+	formatted_message varchar(4096) NOT NULL DEFAULT '',
 	formatted_hash binary(20) NOT NULL,
 	PRIMARY KEY (id_msg),
 	UNIQUE KEY `id_msg_kind-id_game-formatted_hash` (id_msg_kind, id_game, formatted_hash)
@@ -163,7 +163,7 @@ END//
 
 CREATE PROCEDURE resolve_message_formatted (
 	a_id_msg_kind int(10) unsigned,
-	a_formatted_message varchar(1024),
+	a_formatted_message varchar(4096),
 	a_version_value int(10) unsigned
 )
 BEGIN
@@ -290,7 +290,7 @@ END//
 CREATE PROCEDURE create_report_message (
 	a_id_msg_kind int(10) unsigned,
 	a_id_game char(18) CHARACTER SET latin1,
-	a_formatted_message varchar(1024),
+	a_formatted_message varchar(4096),
 	a_id_version int(10) unsigned
 )
 BEGIN
