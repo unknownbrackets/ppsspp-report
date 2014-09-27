@@ -643,3 +643,113 @@ BEGIN
 	SELECT v_id_config_setting;
 END//
 delimiter ;
+
+
+CREATE TABLE genres (
+	id_genre tinyint(3) unsigned NOT NULL auto_increment,
+	title varchar(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (id_genre)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE game_genres (
+	id_game char(14) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.',
+	id_genre tinyint(3) unsigned NOT NULL,
+	hits smallint(5) unsigned NOT NULL DEFAULT 1,
+	PRIMARY KEY (id_game, id_genre)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE compat_ratings (
+	id_compat_rating tinyint(3) unsigned NOT NULL,
+	title varchar(255) NOT NULL DEFAULT '',
+	identifier varchar(32) CHARACTER SET latin1 NOT NULL DEFAULT '',
+	PRIMARY KEY (id_compat_rating)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+INSERT INTO compat_ratings
+	(id_compat_rating, title, identifier)
+VALUES (1, 'Perfect', 'perfect'),
+	(2, 'Playable', 'playable'),
+	(3, 'Ingame', 'ingame'),
+	(4, 'Menu/Intro', 'menu'),
+	(5, 'Doesn''t Boot', 'none');
+
+CREATE TABLE report_compatibility (
+	id_compat int(10) unsigned NOT NULL auto_increment,
+	id_compat_rating tinyint(3) unsigned NOT NULL,
+	id_game char(14) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.',
+	id_version int(10) unsigned NOT NULL,
+	id_platform mediumint(8) unsigned NOT NULL,
+	id_gpu mediumint(8) unsigned NOT NULL,
+	id_cpu mediumint(8) unsigned NOT NULL,
+	id_config int(10) unsigned NOT NULL,
+	latest_report datetime NOT NULL,
+	graphics_stars tinyint(3) unsigned NOT NULL DEFAULT 0,
+	speed_stars tinyint(3) unsigned NOT NULL DEFAULT 0,
+	gameplay_stars tinyint(3) unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY (id_compat),
+	KEY (id_game, latest_report)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE compatibility (
+	id_game char(14) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.',
+	id_compat_rating tinyint(3) unsigned NOT NULL,
+	id_genre tinyint(3) unsigned NOT NULL,
+	latest_report datetime NOT NULL,
+	overall_stars tinyint(3) unsigned NOT NULL DEFAULT 0,
+	graphics_stars tinyint(3) unsigned NOT NULL DEFAULT 0,
+	speed_stars tinyint(3) unsigned NOT NULL DEFAULT 0,
+	gameplay_stars tinyint(3) unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY (id_game),
+	KEY (id_genre),
+	KEY (id_compat_rating),
+	KEY (overall_stars)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+delimiter //
+CREATE PROCEDURE report_compat_hit (
+	a_id_compat_rating tinyint(3) unsigned,
+	a_id_game char(18) CHARACTER SET latin1,
+	a_id_version int(10) unsigned,
+	a_id_gpu mediumint(8) unsigned,
+	a_id_cpu mediumint(8) unsigned,
+	a_id_platform mediumint(8) unsigned,
+	a_id_config int(10) unsigned,
+	a_id_genre tinyint(3) unsigned,
+	a_graphics_stars tinyint(3) unsigned,
+	a_speed_stars tinyint(3) unsigned,
+	a_gameplay_stars tinyint(3) unsigned
+)
+BEGIN
+	DECLARE v_overall_stars tinyint(3) unsigned;
+
+	INSERT INTO report_compatibility
+		(id_compat_rating, id_game, id_version, id_platform, id_gpu, id_cpu, id_config,
+		latest_report, graphics_stars, speed_stars, gameplay_stars)
+	VALUES (a_id_compat_rating, a_id_game, a_id_version, a_id_platform, a_id_gpu, a_id_cpu, a_id_config,
+		NOW(), a_graphics_stars, a_speed_stars, a_gameplay_stars);
+
+	IF a_id_genre != 0 THEN
+		INSERT INTO game_genres
+			(id_game, id_genre)
+		VALUES (a_id_game, a_id_genre)
+			ON DUPLICATE KEY UPDATE
+				hits = hits + 1;
+	END IF;
+
+	SET v_overall_stars = (a_graphics_stars + a_speed_stars + a_gameplay_stars) / 3;
+
+	-- Now we need to update the compatibility average.
+	-- For now, replace.  Smarter later, genre later.
+	INSERT IGNORE INTO compatibility
+		(id_game, id_compat_rating, id_genre, latest_report, overall_stars, graphics_stars, speed_stars, gameplay_stars)
+	VALUES (a_id_game, a_id_compat_rating, a_id_genre, NOW(), v_overall_stars, a_graphics_stars, a_speed_stars, a_gameplay_stars)
+		ON DUPLICATE KEY UPDATE
+			id_compat_rating = VALUES(id_compat_rating),
+			id_genre = IF(a_id_genre = 0, id_genre, VALUES(id_genre)),
+			latest_report = VALUES(latest_report),
+			overall_stars = VALUES(overall_stars),
+			graphics_stars = VALUES(graphics_stars),
+			speed_stars = VALUES(speed_stars),
+			gameplay_stars = VALUES(gameplay_stars);
+END//
+delimiter ;
