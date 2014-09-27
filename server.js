@@ -1,7 +1,8 @@
 #!/bin/env node
 //  OpenShift sample Node application
 var express = require('express');
-var fs      = require('fs');
+var bodyParser = require('body-parser')
+var fs = require('fs');
 
 var report  = require('./lib/report/index');
 
@@ -152,7 +153,8 @@ var SampleApp = function() {
      */
     self.initializeServer = function() {
         self.app = express();
-        self.app.use(express.bodyParser());
+        self.app.use(bodyParser.urlencoded({ extended: false }));
+        self.app.use(bodyParser.json());
 
         //  Add handlers for the app (from the routes).
         self.createRoutes();
