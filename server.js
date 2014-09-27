@@ -4,7 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser')
 var fs = require('fs');
 
-var report  = require('./lib/report/index');
+var logs  = require('./lib/logs/index');
 
 
 /**
@@ -143,7 +143,7 @@ var SampleApp = function() {
 
 		self.routes['*'] = errorRoute;
 
-        report.addRoutes(self);
+        logs.addRoutes(self);
     };
 
 
