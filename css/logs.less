@@ -1,0 +1,69 @@
+#reporting-logs-table
+{
+	width: 100%;
+	margin: 4ex 0;
+
+	tr:nth-child(even)
+	{
+		background: #444;
+	}
+
+	th
+	{
+		white-space: nowrap;
+	}
+
+	th, .title, .version, .latest_report-text
+	{
+		text-align: center;
+	}
+
+	.version, .latest_report-text
+	{
+		white-space: nowrap;
+	}
+
+	a
+	{
+		color: #bbb;
+		text-decoration: none;
+
+		&:hover
+		{
+			color: white;
+			text-decoration: underline;
+		}
+	}
+
+	td
+	{
+		padding: 4px;
+	}
+
+	// For the kinds list.
+	.games-text
+	{
+		text-align: right;
+	}
+
+	.message a
+	{
+		display: block;
+		max-height: 15ex;
+		overflow: hidden;
+		white-space: pre-wrap;
+		transition: max-height 0.25s;
+		transition-delay: 0.2s;
+
+		tr:hover &
+		{
+			max-height: 640px;
+		}
+	}
+
+	.message-text.disabled
+	{
+		color: #BBBBBB !important;
+		text-decoration: none !important;
+	}
+}
