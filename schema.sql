@@ -757,3 +757,6 @@ delimiter ;
 
 ALTER TABLE report_message_versions
 ADD INDEX `id_version-id_msg` (id_version, id_msg);
+
+ALTER TABLE report_message_versions
+ENGINE=InnoDB;
