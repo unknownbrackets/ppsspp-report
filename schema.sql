@@ -753,3 +753,7 @@ BEGIN
 			gameplay_stars = VALUES(gameplay_stars);
 END//
 delimiter ;
+
+
+ALTER TABLE report_message_versions
+ADD INDEX `id_version-id_msg` (id_version, id_msg);
