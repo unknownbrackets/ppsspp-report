@@ -268,7 +268,8 @@ END//
 
 CREATE PROCEDURE create_gpu (
 	a_short_desc varchar(96),
-	a_long_desc varchar(16384)
+	a_long_desc varchar(16384),
+	a_nickname varchar(128)
 )
 BEGIN
 	DECLARE v_id_gpu mediumint(8) unsigned;
@@ -277,8 +278,8 @@ BEGIN
 	SET v_id_gpu = fetch_gpu_(a_short_desc, a_long_desc, v_hash);
 	IF v_id_gpu IS NULL THEN
 		INSERT IGNORE INTO gpus
-			(short_desc, long_desc, hash)
-		VALUES (a_short_desc, a_long_desc, v_hash);
+			(short_desc, long_desc, nickname, hash)
+		VALUES (a_short_desc, a_long_desc, a_nickname, v_hash);
 
 		-- Re-select in case someone else inserted.
 		SET v_id_gpu = fetch_gpu_(a_short_desc, a_long_desc, v_hash);
@@ -760,3 +761,7 @@ ADD INDEX `id_version-id_msg` (id_version, id_msg);
 
 ALTER TABLE report_message_versions
 ENGINE=InnoDB;
+
+
+ALTER TABLE gpus
+ADD COLUMN nickname varchar(128) NOT NULL DEFAULT '';
