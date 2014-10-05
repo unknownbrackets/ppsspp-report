@@ -103,6 +103,12 @@ var ReportApp = function() {
 			res.send(self.getStatic('.' + req.route.path));
 		};
 
+		var imgRoute = function (req, res)
+		{
+			res.setHeader('Content-Type', 'image/png');
+			res.send(self.getStatic('.' + req.route.path));
+		};
+
 		var errorRoute = function (req, res)
 		{
 			res.status(404);
@@ -118,10 +124,15 @@ var ReportApp = function() {
 		self.routes['/css/style.css'] = cssRoute;
 		self.routes['/css/style.min.css'] = cssRoute;
 		self.routes['/css/logs.min.css'] = cssRoute;
+		self.routes['/css/compat.min.css'] = cssRoute;
 
 		self.routes['/js/libs/jquery-1.7.2.min.js'] = jsRoute;
 		self.routes['/js/libs/modernizr-2.5.3-respond-1.1.0.min.js'] = jsRoute;
 		self.routes['/js/common.min.js'] = jsRoute;
+
+		self.routes['/img/star.png'] = imgRoute;
+		self.routes['/img/star2.png'] = imgRoute;
+		self.routes['/img/star_grey.png'] = imgRoute;
 
 		self.routes['*'] = errorRoute;
 
