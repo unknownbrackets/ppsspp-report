@@ -765,3 +765,81 @@ ENGINE=InnoDB;
 
 ALTER TABLE gpus
 ADD COLUMN nickname varchar(128) NOT NULL DEFAULT '';
+
+
+CREATE TABLE gpu_extensions (
+  id_gpu_ext mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  name varchar(128) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_gpu_ext),
+  UNIQUE (name)
+) ENGINE=MyISAM;
+
+CREATE TABLE gpu_extension_map (
+  id_gpu mediumint(8) unsigned NOT NULL,
+  id_gpu_ext mediumint(8) unsigned NOT NULL,
+  PRIMARY KEY (id_gpu, id_gpu_ext)
+) ENGINE=MyISAM;
+
+
+delimiter //
+DROP PROCEDURE IF EXISTS create_gpu//
+CREATE PROCEDURE create_gpu (
+	a_short_desc varchar(96),
+	a_long_desc varchar(16384),
+	a_nickname varchar(128)
+)
+BEGIN
+	DECLARE existed tinyint(1) unsigned DEFAULT 1;
+	DECLARE v_id_gpu mediumint(8) unsigned;
+	DECLARE v_hash binary(20) DEFAULT UNHEX(SHA1(CONCAT(a_short_desc, a_long_desc)));
+
+	SET v_id_gpu = fetch_gpu_(a_short_desc, a_long_desc, v_hash);
+	IF v_id_gpu IS NULL THEN
+		INSERT IGNORE INTO gpus
+			(short_desc, long_desc, nickname, hash)
+		VALUES (a_short_desc, a_long_desc, a_nickname, v_hash);
+
+		-- Re-select in case someone else inserted.
+		SET v_id_gpu = fetch_gpu_(a_short_desc, a_long_desc, v_hash);
+		SET existed = 0;
+	END IF;
+
+	SELECT v_id_gpu, existed;
+END//
+
+CREATE FUNCTION fetch_gpu_ext_ (
+	a_name varchar(128)
+) RETURNS mediumint(8) unsigned READS SQL DATA
+BEGIN
+	RETURN (
+		SELECT id_gpu_ext
+		FROM gpu_extensions
+		WHERE name = a_name
+		LIMIT 1
+	);
+END//
+
+CREATE PROCEDURE create_gpu_extension (
+	a_id_gpu mediumint(8) unsigned,
+	a_name varchar(128)
+)
+BEGIN
+	DECLARE v_id_gpu_ext mediumint(8) unsigned;
+
+	SET v_id_gpu_ext = fetch_gpu_ext_(a_name);
+	IF v_id_gpu_ext IS NULL THEN
+		INSERT IGNORE INTO gpu_extensions
+			(name)
+		VALUES (a_name);
+
+		-- Re-select in case someone else inserted.
+		SET v_id_gpu_ext = fetch_gpu_ext_(a_name);
+	END IF;
+
+	INSERT INTO gpu_extension_map
+		(id_gpu, id_gpu_ext)
+	VALUES (a_id_gpu, v_id_gpu_ext);
+
+	SELECT v_id_gpu_ext;
+END//
+delimiter ;
