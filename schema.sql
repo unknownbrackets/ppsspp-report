@@ -843,3 +843,70 @@ BEGIN
 	SELECT v_id_gpu_ext;
 END//
 delimiter ;
+
+
+delimiter //
+CREATE PROCEDURE update_compat (
+	a_id_game char(18) CHARACTER SET latin1,
+	a_id_genre tinyint(3) unsigned
+)
+BEGIN
+	-- Smarter later, genre later.
+	INSERT IGNORE INTO compatibility
+		(id_game, id_genre, latest_report, graphics_stars, speed_stars, gameplay_stars, overall_stars, id_compat_rating)
+	SELECT
+		id_game, a_id_genre, MAX(latest_report) AS latest_report, AVG(graphics_stars), AVG(speed_stars), AVG(gameplay_stars),
+		(AVG(graphics_stars) + AVG(speed_stars) + AVG(gameplay_stars)) / 3 AS overall_stars,
+		(
+			SELECT id_compat_rating
+			FROM report_compatibility
+			WHERE id_game = a_id_game
+			GROUP BY id_compat_rating
+			ORDER BY COUNT(id_compat_rating) DESC
+			LIMIT 1
+		) AS id_compat_rating
+	FROM report_compatibility
+	WHERE id_game = a_id_game
+		ON DUPLICATE KEY UPDATE
+			id_compat_rating = VALUES(id_compat_rating),
+			id_genre = IF(a_id_genre = 0, id_genre, VALUES(id_genre)),
+			latest_report = VALUES(latest_report),
+			overall_stars = VALUES(overall_stars),
+			graphics_stars = VALUES(graphics_stars),
+			speed_stars = VALUES(speed_stars),
+			gameplay_stars = VALUES(gameplay_stars);
+END//
+
+DROP PROCEDURE report_compat_hit//
+CREATE PROCEDURE report_compat_hit (
+	a_id_compat_rating tinyint(3) unsigned,
+	a_id_game char(18) CHARACTER SET latin1,
+	a_id_version int(10) unsigned,
+	a_id_gpu mediumint(8) unsigned,
+	a_id_cpu mediumint(8) unsigned,
+	a_id_platform mediumint(8) unsigned,
+	a_id_config int(10) unsigned,
+	a_id_genre tinyint(3) unsigned,
+	a_graphics_stars tinyint(3) unsigned,
+	a_speed_stars tinyint(3) unsigned,
+	a_gameplay_stars tinyint(3) unsigned
+)
+BEGIN
+	INSERT INTO report_compatibility
+		(id_compat_rating, id_game, id_version, id_platform, id_gpu, id_cpu, id_config,
+		latest_report, graphics_stars, speed_stars, gameplay_stars)
+	VALUES (a_id_compat_rating, a_id_game, a_id_version, a_id_platform, a_id_gpu, a_id_cpu, a_id_config,
+		NOW(), a_graphics_stars, a_speed_stars, a_gameplay_stars);
+
+	IF a_id_genre != 0 THEN
+		INSERT INTO game_genres
+			(id_game, id_genre)
+		VALUES (a_id_game, a_id_genre)
+			ON DUPLICATE KEY UPDATE
+				hits = hits + 1;
+	END IF;
+
+	-- Now we need to update the compatibility average.
+	CALL update_compat(a_id_game, a_id_genre);
+END//
+delimiter ;
