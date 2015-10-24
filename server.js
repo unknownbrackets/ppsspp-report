@@ -5,6 +5,7 @@ var fs = require('fs');
 
 var logs = require('./lib/logs/index');
 var compat = require('./lib/compat/index');
+var match = require('./lib/match/index');
 
 var ReportApp = function() {
     var self = this;
@@ -138,6 +139,7 @@ var ReportApp = function() {
 
 		logs.addRoutes(self);
 		compat.addRoutes(self);
+		match.addRoutes(self);
 	};
 
 
@@ -147,6 +149,7 @@ var ReportApp = function() {
      */
     self.initializeServer = function() {
         self.app = express();
+        self.app.set('trust proxy', true);
         self.app.use(bodyParser.urlencoded({ extended: false }));
         self.app.use(bodyParser.json());
 
