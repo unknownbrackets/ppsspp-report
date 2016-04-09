@@ -910,3 +910,7 @@ BEGIN
 	CALL update_compat(a_id_game, a_id_genre);
 END//
 delimiter ;
+
+
+ALTER TABLE settings
+ADD COLUMN blocked_version_strings text CHARACTER SET latin1 NOT NULL DEFAULT '';
