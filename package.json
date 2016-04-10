@@ -6,13 +6,14 @@
     "npm": ">= 1.0.0"
   },
   "dependencies": {
-    "mysql": ">= 2.5.1",
     "async": ">= 0.9.0",
-    "plates": "0.4.x",
-    "uglify-js": "~2.3.6",
+    "body-parser": "~1.9.0",
     "clean-css": "~1.0.10",
     "express": "~4.9.5",
-    "body-parser": "~1.9.0"
+    "mysql": ">= 2.5.1",
+    "plates": "0.4.x",
+    "uglify-js": "~2.3.6",
+    "vows": "^0.8.1"
   },
   "devDependencies": {},
   "bundleDependencies": [],
