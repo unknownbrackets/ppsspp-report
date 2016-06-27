@@ -1051,7 +1051,7 @@ CREATE PROCEDURE report_compat_hit (
 	a_graphics_stars tinyint(3) unsigned,
 	a_speed_stars tinyint(3) unsigned,
 	a_gameplay_stars tinyint(3) unsigned,
-	a_disc_crc varhcar(8) CHARACTER SET latin1
+	a_disc_crc varchar(8) CHARACTER SET latin1
 )
 BEGIN
 	INSERT INTO report_compatibility
