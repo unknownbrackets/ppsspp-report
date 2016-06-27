@@ -1031,3 +1031,46 @@ BEGIN
 	SELECT a_id_game;
 END//
 delimiter ;
+
+
+ALTER TABLE report_compatibility
+ADD COLUMN disc_crc varchar(8) CHARACTER SET latin1 NOT NULL DEFAULT '';
+
+delimiter //
+DROP PROCEDURE report_compat_hit//
+CREATE PROCEDURE report_compat_hit (
+	OUT a_id_compat int(10) unsigned,
+	a_id_compat_rating tinyint(3) unsigned,
+	a_id_game char(18) CHARACTER SET latin1,
+	a_id_version int(10) unsigned,
+	a_id_gpu mediumint(8) unsigned,
+	a_id_cpu mediumint(8) unsigned,
+	a_id_platform mediumint(8) unsigned,
+	a_id_config int(10) unsigned,
+	a_id_genre tinyint(3) unsigned,
+	a_graphics_stars tinyint(3) unsigned,
+	a_speed_stars tinyint(3) unsigned,
+	a_gameplay_stars tinyint(3) unsigned,
+	a_disc_crc varhcar(8) CHARACTER SET latin1
+)
+BEGIN
+	INSERT INTO report_compatibility
+		(id_compat_rating, id_game, id_version, id_platform, id_gpu, id_cpu, id_config,
+		latest_report, graphics_stars, speed_stars, gameplay_stars, disc_crc)
+	VALUES (a_id_compat_rating, a_id_game, a_id_version, a_id_platform, a_id_gpu, a_id_cpu, a_id_config,
+		NOW(), a_graphics_stars, a_speed_stars, a_gameplay_stars, a_disc_crc);
+
+	SELECT LAST_INSERT_ID() INTO a_id_compat;
+
+	IF a_id_genre != 0 THEN
+		INSERT INTO game_genres
+			(id_game, id_genre)
+		VALUES (a_id_game, a_id_genre)
+			ON DUPLICATE KEY UPDATE
+				hits = hits + 1;
+	END IF;
+
+	-- Now we need to update the compatibility average.
+	CALL update_compat(a_id_game, a_id_genre);
+END//
+delimiter ;
