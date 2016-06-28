@@ -1124,3 +1124,42 @@ BEGIN
 	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
 END//
 delimiter ;
+
+
+delimiter //
+DROP PROCEDURE create_game//
+CREATE PROCEDURE create_game (
+	a_id_game char(18) CHARACTER SET latin1,
+	a_title varchar(255)
+)
+BEGIN
+	DECLARE v_exists tinyint(1);
+	SET v_exists = fetch_game_exists_(a_id_game);
+	IF v_exists = 0 THEN
+		INSERT IGNORE INTO games
+			(id_game, title)
+		VALUES (a_id_game, a_title);
+	ELSE
+		SET v_exists = EXISTS (
+			SELECT id_game
+			FROM games
+			WHERE id_game = a_id_game
+				AND title LIKE '%?%'
+				AND a_title NOT LIKE '%?%'
+				AND verified_title = 0
+		);
+
+		-- Some proxy has resulted in a lot of ?s for Unicode chars.
+		-- Let's try to fix if possible.
+		IF v_exists = 1 THEN
+			UPDATE games
+			SET title = a_title
+			WHERE id_game = a_id_game
+				AND title LIKE '%?%'
+				AND verified_title = 0;
+		END IF;
+	END IF;
+
+	SELECT a_id_game;
+END//
+delimiter ;
