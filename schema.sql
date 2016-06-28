@@ -1074,3 +1074,53 @@ BEGIN
 	CALL update_compat(a_id_game, a_id_genre);
 END//
 delimiter ;
+
+
+delimiter //
+DROP PROCEDURE IF EXISTS update_compat//
+CREATE PROCEDURE update_compat (
+	a_id_game char(18) CHARACTER SET latin1,
+	a_id_genre tinyint(3) unsigned
+)
+BEGIN
+	DECLARE v_id_compat_rating tinyint(3) unsigned;
+
+	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
+	CREATE TEMPORARY TABLE unique_compatibility
+	SELECT
+		id_game, MAX(latest_report) AS latest_report, MIN(id_compat_rating) AS id_compat_rating,
+		MAX(graphics_stars) AS graphics_stars, MAX(speed_stars) AS speed_stars, MAX(gameplay_stars) AS gameplay_stars
+	FROM report_compatibility
+	WHERE id_game = a_id_game
+	GROUP BY id_game, id_version, id_platform, id_gpu, id_cpu, id_config;
+
+	SET v_id_compat_rating = (
+		SELECT id_compat_rating
+		FROM unique_compatibility
+		WHERE id_game = a_id_game
+		GROUP BY id_compat_rating
+		ORDER BY COUNT(id_compat_rating) DESC, id_compat_rating ASC
+		LIMIT 1
+	);
+
+	-- Smarter later, genre later.
+	INSERT IGNORE INTO compatibility
+		(id_game, id_genre, latest_report, graphics_stars, speed_stars, gameplay_stars, overall_stars, id_compat_rating)
+	SELECT
+		id_game, a_id_genre, MAX(latest_report) AS latest_report, AVG(graphics_stars), AVG(speed_stars), AVG(gameplay_stars),
+		(AVG(graphics_stars) + AVG(speed_stars) + AVG(gameplay_stars)) / 3 AS overall_stars,
+		v_id_compat_rating AS id_compat_rating
+	FROM unique_compatibility
+	WHERE id_game = a_id_game
+		ON DUPLICATE KEY UPDATE
+			id_compat_rating = VALUES(id_compat_rating),
+			id_genre = IF(a_id_genre = 0, id_genre, VALUES(id_genre)),
+			latest_report = VALUES(latest_report),
+			overall_stars = VALUES(overall_stars),
+			graphics_stars = VALUES(graphics_stars),
+			speed_stars = VALUES(speed_stars),
+			gameplay_stars = VALUES(gameplay_stars);
+
+	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
+END//
+delimiter ;
