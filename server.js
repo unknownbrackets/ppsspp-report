@@ -130,6 +130,7 @@ var ReportApp = function() {
 		self.routes['/js/libs/jquery-1.7.2.min.js'] = jsRoute;
 		self.routes['/js/libs/modernizr-2.5.3-respond-1.1.0.min.js'] = jsRoute;
 		self.routes['/js/common.min.js'] = jsRoute;
+		self.routes['/js/game.min.js'] = jsRoute;
 
 		self.routes['/img/star.png'] = imgRoute;
 		self.routes['/img/star2.png'] = imgRoute;

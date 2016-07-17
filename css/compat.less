@@ -17,3 +17,29 @@
 .pagination [href=""] {
 	display: none;
 }
+
+.table-tbody-striped > tbody:nth-child(odd) {
+	td, th {
+		background-color: rgba(100, 100, 100, 0.1);
+	}
+}
+
+.compat-report-list {
+	td[data-config] {
+		border-top: 0;
+		padding-top: 0;
+
+		&:empty {
+			display: none;
+		}
+	}
+
+	ul.unstyled {
+		margin-bottom: 0;
+
+		li.label {
+			display: inline-block;
+			margin-right: 1ex;
+		}
+	}
+}
