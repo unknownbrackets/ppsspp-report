@@ -27,9 +27,18 @@
 		<p>See <a href="logs_url">reported log data</a> for this game.</p>
 
 		<h2>Compatibility reports:</h2>
-		<table class="table table-tbody-striped compat-report-list">
+		<table class="table table-tbody-striped compat-report-list tablesaw tablesaw-stack" data-tablesaw-mode="stack">
 			<thead>
-				<tr><th>Date</th><th>Platform</th><th>GPU</th><th>Version</th><th>Compatibility</th><th>Graphics</th><th>Speed</th><th>Gameplay</th><tr>
+				<tr>
+					<th>Date</th>
+					<th>Platform</th>
+					<th>GPU</th>
+					<th>Version</th>
+					<th>Compat</th>
+					<th>Graphics</th>
+					<th>Speed</th>
+					<th>Gameplay</th>
+				</tr>
 			</thead>
 			<tbody class="reports">
 				<tr>
@@ -54,7 +63,7 @@
 						</div>
 					</td>
 				</tr>
-				<tr>
+				<tr data-tablesaw-no-labels="">
 					<td data-config="data-config" colspan="8"></td>
 				</tr>
 			</tbody>

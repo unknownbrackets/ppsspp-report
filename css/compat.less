@@ -43,3 +43,34 @@
 		}
 	}
 }
+
+.tablesaw-stack {
+	tbody tr {
+		border-bottom: none;
+	}
+}
+
+@media (max-width: 39.9375em) {
+	.tablesaw-stack {
+		table-layout: fixed;
+
+		&:not(.compat-report-list) tbody tr {
+			border-bottom: 1px solid #dfdfdf;
+		}
+
+		.title {
+			display: block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			width: 100%;
+		}
+
+		.rating {
+			display: inline-block;
+		}
+	}
+
+	.reports .gpu {
+		max-width: 100%;
+	}
+}

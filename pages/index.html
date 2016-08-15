@@ -27,16 +27,23 @@
 			<div>
 				<h2>5 latest logged games:</h2>
 				<a href="/games?order=latest">See all &raquo;</a>
-				<table class="table table-striped">
+				<table class="table table-striped tablesaw tablesaw-stack" data-tablesaw-mode="stack" data-tablesaw-no-labels="">
 					<thead>
-						<tr><th>Name</th><th>Region</th><th>Compatibility</th><th>User Rating</th><tr>
+						<tr><th>Name</th><th>Region</th><th>Compatibility</th><th>User Rating</th></tr>
 					</thead>
 					<tbody>
 						<tr class="compat_latest">
 							<td><a href="game_url" class="title"></a></td>
-							<td class="region_version"></td>
-							<td><span class="label"></span></td>
 							<td>
+								<strong class="tablesaw-cell-label">Region</strong>
+								<span class="region_version"></span>
+							</td>
+							<td>
+								<strong class="tablesaw-cell-label">Compat</strong>
+								<span class="label"></span>
+							</td>
+							<td>
+								<strong class="tablesaw-cell-label">Rating</strong>
 								<div class="rating">
 									<div class="rating-active" style="rating-active"></div>
 								</div>
@@ -47,16 +54,23 @@
 
 				<h2>5 highest rated games:</h2>
 				<a href="/games?order=highest">See all &raquo;</a>
-				<table class="table table-striped">
+				<table class="table table-striped tablesaw tablesaw-stack" data-tablesaw-mode="stack" data-tablesaw-no-labels="">
 					<thead>
-						<tr><th>Name</th><th>Region</th><th>Compatibility</th><th>User Rating</th><tr>
+						<tr><th>Name</th><th>Region</th><th>Compatibility</th><th>User Rating</th></tr>
 					</thead>
 					<tbody>
 						<tr class="compat_highest_rated">
 							<td><a href="game_url" class="title"></a></td>
-							<td class="region_version"></td>
-							<td><span class="label"></span></td>
 							<td>
+								<strong class="tablesaw-cell-label">Region</strong>
+								<span class="region_version"></span>
+							</td>
+							<td>
+								<strong class="tablesaw-cell-label">Compat</strong>
+								<span class="label"></span>
+							</td>
+							<td>
+								<strong class="tablesaw-cell-label">Rating</strong>
 								<div class="rating">
 									<div class="rating-active" style="rating-active"></div>
 								</div>

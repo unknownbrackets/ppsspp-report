@@ -25,16 +25,23 @@
 	<div class="container report-ppsspp-org" id="page-reporting-games">
 		<div class="row-fluid">
 			<div>
-				<table class="table table-striped">
+				<table class="table table-striped tablesaw tablesaw-stack" data-tablesaw-mode="stack" data-tablesaw-no-labels="">
 					<thead>
-						<tr><th>Name</th><th>Region</th><th>Compatibility</th><th>User Rating</th><tr>
+						<tr><th>Name</th><th>Region</th><th>Compatibility</th><th>User Rating</th></tr>
 					</thead>
 					<tbody>
 						<tr class="games">
 							<td><a href="game_url" class="title"></a></td>
-							<td class="region_version"></td>
-							<td><span class="label"></span></td>
 							<td>
+								<strong class="tablesaw-cell-label">Region</strong>
+								<span class="region_version"></span>
+							</td>
+							<td>
+								<strong class="tablesaw-cell-label">Compat</strong>
+								<span class="label"></span>
+							</td>
+							<td>
+								<strong class="tablesaw-cell-label">Rating</strong>
 								<div class="rating">
 									<div class="rating-active" style="rating-active"></div>
 								</div>
