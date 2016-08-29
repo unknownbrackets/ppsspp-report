@@ -6,6 +6,7 @@ var fs = require('fs');
 var logs = require('./lib/logs/index');
 var compat = require('./lib/compat/index');
 var match = require('./lib/match/index');
+var uploads = require('./lib/uploads/index');
 
 var ReportApp = function() {
     var self = this;
@@ -141,6 +142,7 @@ var ReportApp = function() {
 		logs.addRoutes(self);
 		compat.addRoutes(self);
 		match.addRoutes(self);
+		uploads.addRoutes(self);
 	};
 
 
