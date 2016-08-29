@@ -18,9 +18,17 @@
 	display: none;
 }
 
-.table-tbody-striped > tbody:nth-child(odd) {
-	td, th {
-		background-color: rgba(100, 100, 100, 0.1);
+.table-tbody-striped {
+	> tbody:nth-child(odd) {
+		td, th {
+			background-color: rgba(100, 100, 100, 0.1);
+		}
+	}
+
+	> tbody:hover {
+		td, th {
+			background-color: #282828;
+		}
 	}
 }
 
