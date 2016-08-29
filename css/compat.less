@@ -1,3 +1,5 @@
+@import "tablesaw";
+
 .rating {
 	background: url('../img/star_grey.png') repeat-x;
 	width: 72px;
@@ -58,7 +60,50 @@
 	}
 }
 
-@media (max-width: 39.9375em) {
+.icon_img:not(:empty) {
+	float: left;
+	padding-right: 15px;
+	padding-bottom: 10px;
+
+	@media (max-width: 599px) {
+		float: none;
+		padding-right: 0;
+
+		img {
+			display: block;
+			margin: auto;
+			max-width: 100%;
+			width: 144px * 1.5;
+		}
+	}
+}
+
+.screenshots:not(:empty) {
+	align-items: center;
+	clear: both;
+	cursor: move;
+	display: flex;
+	list-style: none;
+	margin: 0;
+	margin-bottom: 10px;
+	overflow-x: scroll;
+	padding: 0;
+	-webkit-overflow-scrolling: touch;
+}
+
+.screenshot {
+	min-width: 480px;
+	width: 480px;
+	padding-right: 10px;
+	flex: 0;
+
+	@media (max-width: 599px) {
+		min-width: 80vw;
+		padding-right: 5vw;
+	}
+}
+
+@media (max-width: 699px) {
 	.tablesaw-stack {
 		table-layout: fixed;
 

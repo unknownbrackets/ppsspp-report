@@ -11,12 +11,12 @@ css/style.min.css: css/style.css
 	sh -c 'cat $^ | $(CLEANCSS) -o $@'
 
 css/logs.min.css: css/logs.less
-	sh -c 'cat $^ | $(LESSC) - | $(CLEANCSS) -o $@'
+	sh -c 'cat $^ | $(LESSC) --include-path=css - | $(CLEANCSS) -o $@'
 
-css/compat.min.css: node_modules/tablesaw/dist/stackonly/tablesaw.stackonly.css css/compat.less
-	sh -c 'cat $^ | $(LESSC) - | $(CLEANCSS) -o $@'
+css/compat.min.css: css/compat.less
+	sh -c 'cat $^ | $(LESSC) --include-path=css - | $(CLEANCSS) -o $@'
 
-js/common.min.js: js/libs/bootstrap/bootstrap.min.js node_modules/tablesaw/dist/tablesaw.js node_modules/tablesaw/dist/tablesaw-init.js
+js/common.min.js: js/libs/bootstrap/bootstrap.min.js node_modules/tablesaw/dist/tablesaw.js node_modules/tablesaw/dist/tablesaw-init.js js/libs/dragscroll.js
 	sh -c 'cat $^ | $(UGLIFYJS) -o $@'
 
 js/game.min.js: js/game.js
