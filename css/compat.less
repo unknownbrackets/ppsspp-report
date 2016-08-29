@@ -83,22 +83,27 @@
 }
 
 .screenshots:not(:empty) {
-	align-items: center;
+	align-items: flex-start;
 	cursor: move;
 	display: flex;
+	justify-content: flex-start;
 	list-style: none;
 	margin: 0;
 	margin-bottom: 10px;
+	max-height: 272px;
 	overflow-x: auto;
 	padding: 0;
+	padding-bottom: 5px;
 	-webkit-overflow-scrolling: touch;
 }
 
 .screenshot {
-	min-width: 480px;
-	width: 480px;
-	padding-right: 10px;
 	flex: 0;
+	height: 272px;
+	min-width: 480px;
+	overflow-y: hidden;
+	padding-right: 10px;
+	width: 480px;
 
 	@media (max-width: 599px) {
 		min-width: 80vw;
