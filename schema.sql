@@ -1163,3 +1163,10 @@ BEGIN
 	SELECT a_id_game;
 END//
 delimiter ;
+
+
+ALTER TABLE compatibility
+CHANGE COLUMN overall_stars overall_stars float(23) NOT NULL DEFAULT 0,
+CHANGE COLUMN graphics_stars graphics_stars float(23) NOT NULL DEFAULT 0,
+CHANGE COLUMN speed_stars speed_stars float(23) NOT NULL DEFAULT 0,
+CHANGE COLUMN gameplay_stars gameplay_stars float(23) unsigned NOT NULL DEFAULT 0;
