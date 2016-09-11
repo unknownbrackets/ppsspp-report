@@ -52,6 +52,18 @@
 			margin-right: 1ex;
 		}
 	}
+
+	// Specificty.
+	tbody :target {
+		td {
+			background-color: #282828;
+			border-top: 2px solid #33b5e5;
+		}
+		+ tr td {
+			background-color: #282828;
+			border-bottom: 2px solid #33b5e5;
+		}
+	}
 }
 
 .tablesaw-stack {
