@@ -2,6 +2,7 @@ jQuery(function ($) {
 	$('[data-config]').each(function () {
 		var $col = $(this);
 		var config = $col.data('config');
+		var crc = $col.data('disc-crc');
 		var tags = [];
 
 		// Let's pre-parse the config to make it easier.
@@ -102,6 +103,9 @@ jQuery(function ($) {
 			tags.push('IO Threading Off');
 		if (config.GraphicsTimerHack)
 			tags.push('Timer Hack');
+
+		if (crc && crc != '00000000')
+			tags.push('CRC ' + crc);
 
 		var $ul = $('<ul class="unstyled"></ul>');
 		for (var i = 0; i < tags.length; ++i) {
