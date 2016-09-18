@@ -1170,3 +1170,83 @@ CHANGE COLUMN overall_stars overall_stars float(23) NOT NULL DEFAULT 0,
 CHANGE COLUMN graphics_stars graphics_stars float(23) NOT NULL DEFAULT 0,
 CHANGE COLUMN speed_stars speed_stars float(23) NOT NULL DEFAULT 0,
 CHANGE COLUMN gameplay_stars gameplay_stars float(23) unsigned NOT NULL DEFAULT 0;
+
+
+ALTER TABLE settings
+ADD COLUMN current_version_value int(10) unsigned NOT NULL DEFAULT 0;
+
+UPDATE settings
+SET current_version_value = min_version_value;
+
+delimiter //
+DROP PROCEDURE IF EXISTS update_compat//
+CREATE PROCEDURE update_compat (
+	a_id_game char(18) CHARACTER SET latin1,
+	a_id_genre tinyint(3) unsigned
+)
+BEGIN
+	DECLARE v_id_compat_rating tinyint(3) unsigned;
+	DECLARE v_version_value int(10) unsigned;
+	DECLARE v_total_compat int(10) unsigned;
+
+	SET v_version_value = (
+		SELECT current_version_value
+		FROM settings
+	);
+
+	IF NOT EXISTS (
+		SELECT id_compat
+		FROM report_compatibility
+			INNER JOIN versions AS v USING (id_version)
+		WHERE id_game = a_id_game
+			AND v.value >= v_version_value
+	)
+	THEN
+		SET v_version_value = 0;
+	END IF;
+
+	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
+	CREATE TEMPORARY TABLE unique_compatibility
+	SELECT
+		id_game, MAX(latest_report) AS latest_report, MIN(id_compat_rating) AS id_compat_rating,
+		MAX(graphics_stars) AS graphics_stars, MAX(speed_stars) AS speed_stars, MAX(gameplay_stars) AS gameplay_stars
+	FROM report_compatibility
+		INNER JOIN versions AS v USING (id_version)
+	WHERE id_game = a_id_game
+		AND v.value >= v_version_value
+	GROUP BY id_game, id_version, id_platform, id_gpu, id_cpu, id_config;
+
+	SET v_total_compat = (
+		SELECT COUNT(id_compat_rating)
+		FROM unique_compatibility
+	);
+
+	SET v_id_compat_rating = (
+		SELECT id_compat_rating
+		FROM unique_compatibility
+		GROUP BY id_compat_rating
+		-- Use the best rating that isn't vastly unpopular.
+		ORDER BY IF(COUNT(id_compat_rating) * 100 / v_total_compat >= 5, 1, 0) DESC, id_compat_rating ASC
+		LIMIT 1
+	);
+
+	-- Smarter later, genre later.
+	INSERT IGNORE INTO compatibility
+		(id_game, id_genre, latest_report, graphics_stars, speed_stars, gameplay_stars, overall_stars, id_compat_rating)
+	SELECT
+		id_game, a_id_genre, MAX(latest_report) AS latest_report, AVG(graphics_stars), AVG(speed_stars), AVG(gameplay_stars),
+		(AVG(graphics_stars) + AVG(speed_stars) + AVG(gameplay_stars)) / 3 AS overall_stars,
+		v_id_compat_rating AS id_compat_rating
+	FROM unique_compatibility
+		ON DUPLICATE KEY UPDATE
+			id_compat_rating = VALUES(id_compat_rating),
+			id_genre = IF(a_id_genre = 0, id_genre, VALUES(id_genre)),
+			latest_report = VALUES(latest_report),
+			overall_stars = VALUES(overall_stars),
+			graphics_stars = VALUES(graphics_stars),
+			speed_stars = VALUES(speed_stars),
+			gameplay_stars = VALUES(gameplay_stars);
+
+	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
+END//
+delimiter ;
