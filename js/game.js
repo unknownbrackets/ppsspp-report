@@ -35,9 +35,9 @@ jQuery(function ($) {
 			tags.push('Force Depth Write');
 		if (config.GraphicsSoftwareSkinning === false)
 			tags.push('Software Skinning Off');
-		if (config.SpeedHacksPrescaleUV === false && config.SpeedHacksPrescaleUVCoords === false)
+		if (config.SpeedHacksPrescaleUV === false || config.SpeedHacksPrescaleUVCoords === false)
 			tags.push('Prescale UV Off');
-		if (config.GraphicsMemBlockTransferGPU === false && config.GraphicsBlockTransferGPU === false)
+		if (config.GraphicsMemBlockTransferGPU === false || config.GraphicsBlockTransferGPU === false)
 			tags.push('Block Transfer Off');
 		if (config.GraphicsDisableSlowFramebufEffects)
 			tags.push('Disable Slow Effects');
@@ -45,14 +45,16 @@ jQuery(function ($) {
 			tags.push('Disable Stencil Test');
 		if (config.GraphicsMipMap === false)
 			tags.push('Mipmaps Off');
-		if (!config.GraphicsHardwareTransform)
+		if (config.GraphicsHardwareTransform === false)
 			tags.push('HW Transform Off');
+		if (config.GraphicsHardwareTessellation)
+			tags.push('HW Tessellation');
 		if (config.GraphicsTextureBackoffCache)
 			tags.push('Lazy Texture Caching');
 		if (config.GraphicsTextureSecondaryCache)
 			tags.push('Secondary Texture Cache');
-		if (!config.GraphicsVertexCache)
-			tags.push('Vertex Cache Off');
+		if (config.GraphicsVertexCache || config.GraphicsVertexDecCache)
+			tags.push('Vertex Cache');
 
 		if (!config.GraphicsForceMaxEmulatedFPS)
 			tags.push('Force Max FPS Off');
