@@ -130,4 +130,20 @@ vows.describe('Version parsing').addBatch({
 			assert.isTrue(value < lookups.calcVersionValue('v1.2.3'));
 		},
 	},
+
+	'A "super minor" version': {
+		topic: lookups.calcVersionValue('v1.3.0.1'),
+
+		'should parse': function (value) {
+			assert.notEqual(value, 0);
+		},
+
+		'should be greater than last stable': function (value) {
+			assert.isTrue(value > lookups.calcVersionValue('v1.3'));
+		},
+
+		'should be less than next stable': function (value) {
+			assert.isTrue(value < lookups.calcVersionValue('v1.3.1'));
+		},
+	},
 }).export(module);
