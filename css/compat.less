@@ -122,6 +122,59 @@
 	}
 }
 
+.filters {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: -1ex;
+
+	ul, li {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	ul {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	li {
+		margin-right: 1ex;
+		margin-top: 1ex;
+	}
+
+	.label {
+		padding: 3px 6px;
+	}
+
+	.navbar-search {
+		margin-top: 1ex;
+	}
+
+	// Unfortunate that we don't have variables, but force the color when active.
+	.label.active {
+		background-color: #666;
+	}
+	.label-important.active {
+		background-color: #b94a48;
+	}
+	.label-warning.active {
+		background-color: #ff8800;
+	}
+	.label-success.active {
+		background-color: #468847;
+	}
+	.label-info.active {
+		background-color: #0099cc;
+	}
+	.label-inverse.active {
+		background-color: #282828;
+	}
+}
+
 @media (max-width: 699px) {
 	.tablesaw-stack {
 		table-layout: fixed;
@@ -140,6 +193,11 @@
 		.rating {
 			display: inline-block;
 		}
+	}
+
+	.filters {
+		flex-direction: column;
+		justify-content: flex-start;
 	}
 
 	.reports .gpu {

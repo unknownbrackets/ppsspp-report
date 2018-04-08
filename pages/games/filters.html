@@ -1,0 +1,18 @@
+<ul data-filter="compat">
+	<li><a href="/games" class="label label-inverse" data-compat="">All</a></li>
+	<li><a href="/games?compat=perfect" class="label label-success" data-compat="perfect">Perfect</a></li>
+	<li><a href="/games?compat=playable" class="label label-info" data-compat="playable">Playable</a></li>
+	<li><a href="/games?compat=ingame" class="label label-warning" data-compat="ingame">Ingame</a></li>
+	<li><a href="/games?compat=menu" class="label label-important" data-compat="menu">Menu/Intro</a></li>
+	<li><a href="/games?compat=none" class="label label-important" data-compat="none">Doesn't Boot</a></li>
+	<li><a href="/games?compat=unknown" class="label" data-compat="unknown">Unreported</a></li>
+</ul>
+
+<form action="/games" method="get" class="navbar-search">
+	<div class="input-group">
+		<input type="search" class="form-control search-query" name="name" value="" required="required" />
+		<span class="input-group-btn">
+			<button class="btn btn-default" type="submit">Search</button>
+		</span>
+	</div>
+</form>
