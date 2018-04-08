@@ -1250,3 +1250,118 @@ BEGIN
 	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
 END//
 delimiter ;
+
+
+ALTER TABLE games
+CHANGE COLUMN title title varchar(255) CHARACTER SET utf8mb4 NOT NULL DEFAULT '';
+
+delimiter //
+DROP PROCEDURE create_game//
+CREATE PROCEDURE create_game (
+	a_id_game char(18) CHARACTER SET latin1,
+	a_title varchar(255) CHARACTER SET utf8mb4
+)
+BEGIN
+	DECLARE v_exists tinyint(1);
+	SET v_exists = fetch_game_exists_(a_id_game);
+	IF v_exists = 0 THEN
+		INSERT IGNORE INTO games
+			(id_game, title)
+		VALUES (a_id_game, a_title);
+	ELSE
+		SET v_exists = EXISTS (
+			SELECT id_game
+			FROM games
+			WHERE id_game = a_id_game
+				AND (title LIKE '%?%' OR title = '')
+				AND a_title NOT LIKE '%?%'
+				AND verified_title = 0
+		);
+
+		-- Some proxy has resulted in a lot of ?s for Unicode chars.
+		-- Let's try to fix if possible.
+		IF v_exists = 1 THEN
+			UPDATE games
+			SET title = a_title
+			WHERE id_game = a_id_game
+				AND (title LIKE '%?%' OR title = '')
+				AND verified_title = 0;
+		END IF;
+	END IF;
+
+	SELECT a_id_game;
+END//
+delimiter ;
+
+delimiter //
+DROP PROCEDURE IF EXISTS update_compat//
+CREATE PROCEDURE update_compat (
+	a_id_game char(18) CHARACTER SET latin1,
+	a_id_genre tinyint(3) unsigned
+)
+BEGIN
+	DECLARE v_id_compat_rating tinyint(3) unsigned;
+	DECLARE v_version_value int(10) unsigned;
+	DECLARE v_total_compat int(10) unsigned;
+
+	SET v_version_value = (
+		SELECT current_version_value
+		FROM settings
+	);
+
+	IF NOT EXISTS (
+		SELECT id_compat
+		FROM report_compatibility
+			INNER JOIN versions AS v USING (id_version)
+		WHERE id_game = a_id_game
+			AND v.value >= v_version_value
+	)
+	THEN
+		SET v_version_value = 0;
+	END IF;
+
+	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
+	CREATE TEMPORARY TABLE unique_compatibility
+	SELECT
+		id_game, MAX(latest_report) AS latest_report, MIN(id_compat_rating) AS id_compat_rating,
+		MAX(graphics_stars) AS graphics_stars, MAX(speed_stars) AS speed_stars, MAX(gameplay_stars) AS gameplay_stars
+	FROM report_compatibility
+		INNER JOIN versions AS v USING (id_version)
+	WHERE id_game = a_id_game
+		AND v.value >= v_version_value
+	GROUP BY id_game, id_version, id_platform, id_gpu, id_cpu, id_config;
+
+	SET v_total_compat = (
+		SELECT COUNT(id_compat_rating)
+		FROM unique_compatibility
+	);
+
+	SET v_id_compat_rating = (
+		SELECT id_compat_rating
+		FROM unique_compatibility
+		GROUP BY id_compat_rating
+		-- Use the best rating that isn't vastly unpopular.
+		ORDER BY IF(COUNT(id_compat_rating) * 100 / v_total_compat >= 5, 1, 0) DESC, id_compat_rating ASC
+		LIMIT 1
+	);
+
+	-- Smarter later, genre later.
+	INSERT IGNORE INTO compatibility
+		(id_game, id_genre, latest_report, graphics_stars, speed_stars, gameplay_stars, overall_stars, id_compat_rating)
+	SELECT
+		a_id_game, a_id_genre, MAX(latest_report) AS latest_report, AVG(graphics_stars), AVG(speed_stars), AVG(gameplay_stars),
+		(AVG(graphics_stars) + AVG(speed_stars) + AVG(gameplay_stars)) / 3 AS overall_stars,
+		v_id_compat_rating AS id_compat_rating
+	FROM unique_compatibility
+		ON DUPLICATE KEY UPDATE
+			id_compat_rating = VALUES(id_compat_rating),
+			id_genre = IF(a_id_genre = 0, id_genre, VALUES(id_genre)),
+			latest_report = VALUES(latest_report),
+			overall_stars = VALUES(overall_stars),
+			graphics_stars = VALUES(graphics_stars),
+			speed_stars = VALUES(speed_stars),
+			gameplay_stars = VALUES(gameplay_stars);
+
+	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
+END//
+delimiter ;
