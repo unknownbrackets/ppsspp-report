@@ -33,17 +33,17 @@ jQuery(function ($) {
 			tags.push('Disable Alpha Test');
 		if (config.GraphicsAlwaysDepthWrite)
 			tags.push('Force Depth Write');
-		if (!config.GraphicsSoftwareSkinning)
+		if (config.GraphicsSoftwareSkinning === false)
 			tags.push('Software Skinning Off');
-		if (!config.SpeedHacksPrescaleUV && !config.SpeedHacksPrescaleUVCoords)
+		if (config.SpeedHacksPrescaleUV === false && config.SpeedHacksPrescaleUVCoords === false)
 			tags.push('Prescale UV Off');
-		if (!config.GraphicsMemBlockTransferGPU && !config.GraphicsBlockTransferGPU)
+		if (config.GraphicsMemBlockTransferGPU === false && config.GraphicsBlockTransferGPU === false)
 			tags.push('Block Transfer Off');
 		if (config.GraphicsDisableSlowFramebufEffects)
 			tags.push('Disable Slow Effects');
 		if (config.GraphicsDisableStencilTest)
 			tags.push('Disable Stencil Test');
-		if (!config.GraphicsMipMap)
+		if (config.GraphicsMipMap === false)
 			tags.push('Mipmaps Off');
 		if (!config.GraphicsHardwareTransform)
 			tags.push('HW Transform Off');
