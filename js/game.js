@@ -2,7 +2,7 @@ jQuery(function ($) {
 	$('[data-config]').each(function () {
 		var $col = $(this);
 		var config = $col.data('config');
-		var crc = $col.data('disc-crc');
+		var crc = $col.attr('data-disc-crc');
 		var tags = [];
 
 		// Let's pre-parse the config to make it easier.
