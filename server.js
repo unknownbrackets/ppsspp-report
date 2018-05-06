@@ -41,8 +41,8 @@ var ReportApp = function() {
 	};
 
 	// Do not use on untrusted user strings.  Keys must be paths.
-    self.getStatic = function (key)
-    {
+	self.getStatic = function (key)
+	{
 		if (key in self.staticCache)
 			return self.staticCache[key];
 
@@ -151,6 +151,24 @@ var ReportApp = function() {
 		compat.addRoutes(self);
 		match.addRoutes(self);
 		uploads.addRoutes(self);
+	};
+
+	self.secureRoute = function (req, res, next)
+	{
+		if (!req.secure && process.env.OPENSHIFT_EXTERNAL_URL)
+		{
+			var secureUrl = process.env.OPENSHIFT_EXTERNAL_URL + req.originalUrl;
+			res.redirect(301, secureUrl);
+			res.end();
+		}
+		else
+			next();
+	};
+
+	self.getSecure = function (path, func)
+	{
+		self.app.use(path, self.secureRoute);
+		self.app.get(path, func);
 	};
 
 
