@@ -59,6 +59,8 @@ jQuery(function ($) {
 		var $this = $(this);
 		var params = Object.assign({}, filterParams);
 		params.name = this.elements.name.value;
+		if (params.name === '')
+			delete params.name;
 		delete params.compat;
 		delete params.region;
 		document.location = addUrlParams($this.attr('action'), params);
