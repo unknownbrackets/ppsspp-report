@@ -55,11 +55,14 @@ jQuery(function ($) {
 		document.location = addUrlParams($(this).data('href'), params);
 	});
 
-	$('.navbar-search').each(function () {
+	$('.navbar-search').submit(function (ev) {
 		var $this = $(this);
 		var params = Object.assign({}, filterParams);
-		delete params.name;
-		$this.attr('action', addUrlParams($this.attr('action'), params));
+		params.name = this.elements.name.value;
+		delete params.compat;
+		delete params.region;
+		document.location = addUrlParams($this.attr('action'), params);
+		ev.preventDefault();
 	});
 
 	$('.filter-expand').click(function () {
