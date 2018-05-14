@@ -21,6 +21,8 @@ jQuery(function ($) {
 	var compat = getUrlParameter('compat');
 
 	var filterParams = {};
+	if (name)
+		filterParams.name = name;
 	if (region)
 		filterParams.region = region;
 	if (order)
@@ -51,6 +53,13 @@ jQuery(function ($) {
 		else
 			delete params.region;
 		document.location = addUrlParams($(this).data('href'), params);
+	});
+
+	$('.navbar-search').each(function () {
+		var $this = $(this);
+		var params = Object.assign({}, filterParams);
+		delete params.name;
+		$this.attr('action', addUrlParams($this.attr('action'), params));
 	});
 
 	$('.filter-expand').click(function () {
