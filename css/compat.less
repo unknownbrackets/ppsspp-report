@@ -139,6 +139,7 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
+		margin-top: -1ex;
 	}
 
 	li {
@@ -152,6 +153,10 @@
 
 	.navbar-search {
 		margin-top: 1ex;
+	}
+
+	.search-query {
+		vertical-align: 2px;
 	}
 
 	// Unfortunate that we don't have variables, but force the color when active.
@@ -172,6 +177,16 @@
 	}
 	.label-inverse.active {
 		background-color: #282828;
+	}
+
+	.filter-expand {
+		display: none;
+	}
+
+	select[data-filter="region"] {
+		width: auto;
+		margin-top: 2px;
+		margin-bottom: 0;
 	}
 }
 
@@ -198,6 +213,27 @@
 	.filters {
 		flex-direction: column;
 		justify-content: flex-start;
+
+		ul {
+			margin-top: 0;
+		}
+
+		.filter-expand {
+			display: inline-block;
+			width: 100%;
+		}
+
+		.filter-hidden {
+			display: none;
+		}
+
+		[data-filter="compat"] {
+			padding-bottom: 1ex;
+		}
+
+		select[data-filter="region"] {
+			width: 100%;
+		}
 	}
 
 	.reports .gpu {

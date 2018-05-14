@@ -1,3 +1,4 @@
+<button class="btn filter-expand">Filter Compatibility</button>
 <ul data-filter="compat">
 	<li><a href="/games" class="label label-inverse" data-compat="">All</a></li>
 	<li><a href="/games?compat=perfect" class="label label-success" data-compat="perfect">Perfect (<span class="perfect_count"></span>)</a></li>
@@ -7,6 +8,20 @@
 	<li><a href="/games?compat=none" class="label label-important" data-compat="none">Doesn't Boot (<span class="none_count"></span>)</a></li>
 	<li><a href="/games?compat=unknown" class="label" data-compat="unknown">Unreported (<span class="unknown_count"></span>)</a></li>
 </ul>
+
+<button class="btn filter-expand">Filter Region</button>
+<select name="region" data-filter="region" data-href="/games">
+	<option value="">All Regions</option>
+	<option value="japan">Japan</option>
+	<option value="europe">Europe</option>
+	<option value="usa">USA</option>
+	<option value="asia">Asia</option>
+	<option value="hong kong">Hong Kong</option>
+	<option value="southeast asia">Southeast Asia</option>
+	<option value="sample">Sample</option>
+	<option value="internal">Internal</option>
+	<option value="homebrew">Homebrew</option>
+</select>
 
 <form action="/games" method="get" class="navbar-search">
 	<div class="input-group">
