@@ -1365,3 +1365,12 @@ BEGIN
 	DROP TEMPORARY TABLE IF EXISTS unique_compatibility;
 END//
 delimiter ;
+
+ALTER TABLE compatibility
+CHANGE COLUMN id_game `id_game` char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.';
+
+ALTER TABLE report_compatibility
+CHANGE COLUMN id_game `id_game` char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.';
+
+ALTER TABLE game_genres
+CHANGE COLUMN id_game `id_game` char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.';
