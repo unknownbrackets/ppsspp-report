@@ -1,4 +1,4 @@
-CLEANCSS = sh ./node_modules/.bin/cleancss -e
+CLEANCSS = sh ./node_modules/.bin/cleancss -O2
 UGLIFYJS = sh ./node_modules/.bin/uglifyjs -c -m
 LESSC = sh ./node_modules/.bin/lessc
 GZIP = gzip -9

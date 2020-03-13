@@ -9,7 +9,7 @@
     "async": "^1.5.2",
     "body-parser": "^1.9.0",
     "buffer-equal-constant-time": "^1.0.1",
-    "clean-css": "^1.0.10",
+    "clean-css-cli": "^4.2.3",
     "express": "^4.9.5",
     "ip-address": "^5.8.9",
     "jpeg-recompress-bin": "^3.0.1",
@@ -20,7 +20,7 @@
     "optipng-bin": "^4.0.0",
     "plates": "0.4.x",
     "tablesaw": "^2.0.3",
-    "uglify-js": "^2.3.6",
+    "uglify-js": "^3.8.0",
     "vows": "^0.8.1"
   },
   "devDependencies": {},
