@@ -101,8 +101,6 @@ jQuery(function ($) {
 
 		if (config.CPUSeparateCPUThread)
 			tags.push('Multithreading');
-		if (!config.CPUSeparateIOThread)
-			tags.push('IO Threading Off');
 		if (config.GraphicsTimerHack)
 			tags.push('Timer Hack');
 

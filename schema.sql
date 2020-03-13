@@ -1374,3 +1374,10 @@ CHANGE COLUMN id_game `id_game` char(18) CHARACTER SET latin1 NOT NULL COMMENT '
 
 ALTER TABLE game_genres
 CHANGE COLUMN id_game `id_game` char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.';
+
+CREATE TABLE game_families (
+	`id_game_primary` char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.',
+	`id_game` char(18) CHARACTER SET latin1 NOT NULL COMMENT 'Without hyphen.',
+	PRIMARY KEY (id_game_primary, id_game),
+	KEY id_game (id_game)
+) ENGINE=MyISAM;
