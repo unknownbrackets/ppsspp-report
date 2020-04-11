@@ -19,6 +19,7 @@ jQuery(function ($) {
 	var region = getUrlParameter('region');
 	var order = getUrlParameter('order');
 	var compat = getUrlParameter('compat');
+	var genre = getUrlParameter('genre');
 
 	var filterParams = {};
 	if (name)
@@ -29,6 +30,8 @@ jQuery(function ($) {
 		filterParams.order = order;
 	if (compat)
 		filterParams.compat = compat;
+	if (genre)
+		filterParams.genre = genre;
 
 	if (name)
 		$('input[name="name"]').val(name);
