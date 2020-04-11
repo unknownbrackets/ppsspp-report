@@ -139,6 +139,25 @@
 	}
 }
 
+.genres-list {
+	float: right;
+	margin: 0;
+	padding: 0;
+
+	li:first-of-type::before {
+		content: 'Genres: ';
+	}
+
+	li {
+		display: inline;
+		margin: 0;
+		padding: 0;
+	}
+	li + li::before {
+		content: ", ";
+	}
+}
+
 .filters {
 	display: flex;
 	flex-direction: row;
@@ -260,5 +279,14 @@
 
 	.reports .gpu {
 		max-width: 100%;
+	}
+
+	.game-header {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.genres-list {
+		order: 2;
 	}
 }
