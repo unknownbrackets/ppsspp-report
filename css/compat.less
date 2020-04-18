@@ -77,6 +77,10 @@
 	padding-right: 15px;
 	padding-bottom: 10px;
 
+	img {
+		max-height: 80px;
+	}
+
 	@media (max-width: 599px) {
 		float: none;
 		padding-right: 0;
@@ -84,6 +88,7 @@
 		img {
 			display: block;
 			margin: auto;
+			max-height: none;
 			max-width: 100%;
 			width: 144px * 1.5;
 		}
@@ -129,6 +134,10 @@
 		padding-bottom: 0;
 		padding-right: 0;
 
+		img {
+			max-height: 20px;
+		}
+
 		@media (max-width: 599px) {
 			img {
 				display: inline-block;
@@ -137,10 +146,6 @@
 				width: auto;
 			}
 		}
-	}
-
-	img {
-		max-height: 20px;
 	}
 
 	.label {
