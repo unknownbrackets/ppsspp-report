@@ -94,6 +94,14 @@ var ReportApp = function() {
 		// TODO: It'd probably be better to serve these via nginx directly.
 		const MAX_AGE = 3600 * 4;
 
+		var iconRoute = function (req, res)
+		{
+			res.setHeader('Content-Type', 'image/x-icon');
+			res.setHeader('Cache-Control', 'public, max-age=' + MAX_AGE);
+			res.setHeader('Expires', new Date(Date.now() + MAX_AGE * 1000).toUTCString());
+			res.send(self.getStatic('.' + req.route.path));
+		};
+
 		var cssRoute = function (req, res)
 		{
 			res.setHeader('Content-Type', 'text/css');
@@ -129,6 +137,8 @@ var ReportApp = function() {
 
 			res.type('txt').end('404 Not Found');
 		};
+
+		self.routes['/favicon.ico'] = iconRoute;
 
 		self.routes['/css/style.css'] = cssRoute;
 		self.routes['/css/style.min.css'] = cssRoute;
