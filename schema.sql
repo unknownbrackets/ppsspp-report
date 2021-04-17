@@ -1608,3 +1608,62 @@ BEGIN
 	SELECT a_id_game;
 END//
 delimiter ;
+
+-- Workaround previous bug is storing extension data.
+
+delimiter //
+DROP PROCEDURE IF EXISTS create_gpu//
+CREATE PROCEDURE create_gpu (
+	a_short_desc varchar(96),
+	a_long_desc varchar(16384),
+	a_nickname varchar(128)
+)
+BEGIN
+	DECLARE existed tinyint(1) unsigned DEFAULT 0;
+	DECLARE v_id_gpu mediumint(8) unsigned;
+	DECLARE v_hash binary(20) DEFAULT UNHEX(SHA1(CONCAT(a_short_desc, a_long_desc)));
+
+	SET v_id_gpu = fetch_gpu_(a_short_desc, a_long_desc, v_hash);
+	IF v_id_gpu IS NULL THEN
+		INSERT IGNORE INTO gpus
+			(short_desc, long_desc, nickname, hash)
+		VALUES (a_short_desc, a_long_desc, a_nickname, v_hash);
+
+		-- Re-select in case someone else inserted.
+		SET v_id_gpu = fetch_gpu_(a_short_desc, a_long_desc, v_hash);
+	ELSE
+		SET existed = EXISTS (
+			SELECT id_gpu
+			FROM gpu_extension_map
+			WHERE id_gpu = v_id_gpu
+		);
+	END IF;
+
+	SELECT v_id_gpu, existed;
+END//
+
+DROP PROCEDURE IF EXISTS create_gpu_extension//
+CREATE PROCEDURE create_gpu_extension (
+	a_id_gpu mediumint(8) unsigned,
+	a_name varchar(128)
+)
+BEGIN
+	DECLARE v_id_gpu_ext mediumint(8) unsigned;
+
+	SET v_id_gpu_ext = fetch_gpu_ext_(a_name);
+	IF v_id_gpu_ext IS NULL THEN
+		INSERT IGNORE INTO gpu_extensions
+			(name)
+		VALUES (a_name);
+
+		-- Re-select in case someone else inserted.
+		SET v_id_gpu_ext = fetch_gpu_ext_(a_name);
+	END IF;
+
+	INSERT IGNORE INTO gpu_extension_map
+		(id_gpu, id_gpu_ext)
+	VALUES (a_id_gpu, v_id_gpu_ext);
+
+	SELECT v_id_gpu_ext;
+END//
+delimiter ;
