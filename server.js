@@ -1,6 +1,6 @@
 #!/bin/env node
 var express = require('express');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 var fs = require('fs');
 
 var logs = require('./lib/logs/index');
