@@ -1382,6 +1382,195 @@ CREATE TABLE game_families (
 	KEY id_game (id_game)
 ) ENGINE=MyISAM;
 
+
+delimiter //
+DROP PROCEDURE create_game_family_name//
+CREATE PROCEDURE create_game_family_name (
+	a_title varchar(255) CHARACTER SET utf8mb4
+)
+BEGIN
+	DECLARE v_id_game_primary char(18) CHARACTER SET latin1;
+	SET v_id_game_primary = (
+		SELECT SUBSTRING(id_game, 1, 9)
+		FROM games
+		WHERE title = a_title
+		ORDER BY
+			CASE SUBSTRING(id_game, 3, 1) WHEN 'U' THEN 1 WHEN 'J' THEN 2 WHEN 'E' THEN 3 ELSE 4 END,
+			IF(SUBSTRING(id_game, 1, 1) = 'U', 1, 2)
+		LIMIT 1
+	);
+
+	DELETE FROM game_families
+	WHERE id_game_primary != v_id_game_primary
+		AND id_game IN (
+			SELECT id_game
+			FROM games
+			WHERE title = a_title
+		);
+
+	INSERT IGNORE INTO game_families
+		(id_game_primary, id_game)
+	SELECT v_id_game_primary, id_game
+	FROM games
+	WHERE title = a_title;
+
+	SELECT id_game_primary, COUNT(id_game)
+	FROM game_families
+	WHERE id_game_primary = v_id_game_primary
+	GROUP BY id_game_primary;
+END//
+delimiter ;
+
+delimiter //
+DROP PROCEDURE create_game_family_name_like//
+CREATE PROCEDURE create_game_family_name_like (
+	a_title varchar(255) CHARACTER SET utf8mb4
+)
+BEGIN
+	DECLARE v_id_game_primary char(18) CHARACTER SET latin1;
+	SET v_id_game_primary = (
+		SELECT SUBSTRING(id_game, 1, 9)
+		FROM games
+		WHERE title LIKE a_title
+		ORDER BY
+			CASE SUBSTRING(id_game, 3, 1) WHEN 'U' THEN 1 WHEN 'J' THEN 2 WHEN 'E' THEN 3 ELSE 4 END,
+			IF(SUBSTRING(id_game, 1, 1) = 'U', 1, 2)
+		LIMIT 1
+	);
+
+	DELETE FROM game_families
+	WHERE id_game_primary != v_id_game_primary
+		AND id_game IN (
+			SELECT id_game
+			FROM games
+			WHERE title LIKE a_title
+		);
+
+	INSERT IGNORE INTO game_families
+		(id_game_primary, id_game)
+	SELECT v_id_game_primary, id_game
+	FROM games
+	WHERE title LIKE a_title;
+
+	SELECT id_game_primary, COUNT(id_game)
+	FROM game_families
+	WHERE id_game_primary = v_id_game_primary
+	GROUP BY id_game_primary;
+END//
+delimiter ;
+
+delimiter //
+DROP PROCEDURE add_game_family_name_like//
+CREATE PROCEDURE add_game_family_name_like (
+	a_title_primary varchar(255) CHARACTER SET utf8mb4,
+	a_title varchar(255) CHARACTER SET utf8mb4
+)
+BEGIN
+	DECLARE v_id_game_primary char(18) CHARACTER SET latin1;
+	SET v_id_game_primary = (
+		SELECT SUBSTRING(id_game, 1, 9)
+		FROM games
+		WHERE title LIKE a_title_primary
+		ORDER BY
+			CASE SUBSTRING(id_game, 3, 1) WHEN 'U' THEN 1 WHEN 'J' THEN 2 WHEN 'E' THEN 3 ELSE 4 END,
+			IF(SUBSTRING(id_game, 1, 1) = 'U', 1, 2)
+		LIMIT 1
+	);
+
+	DELETE FROM game_families
+	WHERE id_game_primary != v_id_game_primary
+		AND id_game IN (
+			SELECT id_game
+			FROM games
+			WHERE title LIKE a_title
+		);
+
+	INSERT IGNORE INTO game_families
+		(id_game_primary, id_game)
+	SELECT v_id_game_primary, id_game
+	FROM games
+	WHERE title LIKE a_title;
+
+	SELECT id_game_primary, COUNT(id_game)
+	FROM game_families
+	WHERE id_game_primary = v_id_game_primary
+	GROUP BY id_game_primary;
+END//
+delimiter ;
+
+delimiter //
+DROP PROCEDURE add_game_family_game_like//
+CREATE PROCEDURE add_game_family_game_like (
+	a_id_game_primary char(18) CHARACTER SET latin1,
+	a_title varchar(255) CHARACTER SET utf8mb4
+)
+BEGIN
+	DELETE FROM game_families
+	WHERE id_game_primary != a_id_game_primary
+		AND id_game IN (
+			SELECT id_game
+			FROM games
+			WHERE title LIKE a_title
+		);
+
+	INSERT IGNORE INTO game_families
+		(id_game_primary, id_game)
+	SELECT a_id_game_primary, id_game
+	FROM games
+	WHERE title LIKE a_title;
+
+	SELECT id_game_primary, COUNT(id_game)
+	FROM game_families
+	WHERE id_game_primary = a_id_game_primary
+	GROUP BY id_game_primary;
+END//
+delimiter ;
+
+delimiter //
+DROP PROCEDURE add_game_genre//
+CREATE PROCEDURE add_game_genre (
+	a_title varchar(255) CHARACTER SET utf8mb4,
+	a_genre_title varchar(255)
+)
+BEGIN
+	DROP TEMPORARY TABLE IF EXISTS tmp_genre_games;
+	CREATE TEMPORARY TABLE tmp_genre_games (
+		PRIMARY KEY (id_game)
+	)
+	SELECT id_game
+	FROM games
+	WHERE title LIKE a_title
+	UNION
+	SELECT id_game
+	FROM game_families
+	WHERE id_game_primary IN (
+		SELECT id_game_primary
+		FROM game_families
+		WHERE id_game IN (
+				SELECT id_game
+				FROM games
+				WHERE title LIKE a_title
+			)
+		);
+
+	INSERT IGNORE INTO game_genres
+		(id_game, id_genre, hits)
+	SELECT g.id_game, ge.id_genre, 1
+	FROM tmp_genre_games AS g
+		INNER JOIN genres AS ge
+	WHERE ge.title LIKE a_genre_title;
+
+	SELECT id_game, GROUP_CONCAT(title)
+	FROM game_genres
+		NATURAL JOIN genres
+	WHERE id_game IN (
+			SELECT id_game
+			FROM tmp_genre_games
+		)
+	GROUP BY id_game;
+END//
+delimiter ;
+
 delimiter //
 DROP PROCEDURE create_game//
 CREATE PROCEDURE create_game (
@@ -1401,7 +1590,7 @@ BEGIN
 			FROM games
 			WHERE id_game = a_id_game
 				AND (title LIKE '%?%' OR title = '' OR title = '(untitled homebrew)')
-				AND a_title NOT LIKE '%?%'
+				AND a_title NOT LIKE '%?%' AND a_title != ''
 				AND verified_title = 0
 		);
 
