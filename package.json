@@ -11,7 +11,7 @@
     "buffer-equal-constant-time": "^1.0.1",
     "clean-css-cli": "^5.2.2",
     "express": "^4.17.1",
-    "ip-address": "^5.8.9",
+    "ip-address": "^7.1.0",
     "jpeg-recompress-bin": "^5.1.1",
     "less": "^4.1.1",
     "mozjpeg": "^7.0.0",
