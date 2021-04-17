@@ -16,7 +16,7 @@
     "less": "^4.1.1",
     "mozjpeg": "^7.0.0",
     "multer": "^1.4.2",
-    "mysql": ">= 2.18.1",
+    "mysql2": "^2.2.5",
     "optipng-bin": "^7.0.0",
     "plates": "0.4.x",
     "tablesaw": "^3.1.2",
