@@ -1667,3 +1667,96 @@ BEGIN
 	SELECT v_id_gpu_ext;
 END//
 delimiter ;
+
+
+delimiter //
+DROP PROCEDURE IF EXISTS create_game//
+CREATE PROCEDURE create_game (
+	a_id_game char(18) CHARACTER SET latin1,
+	a_title varchar(255) CHARACTER SET utf8mb4
+)
+BEGIN
+	DECLARE v_exists tinyint(1);
+	DECLARE v_homebrew tinyint(1);
+	DECLARE v_result varchar(18) CHARACTER SET latin1;
+
+	SET v_exists = fetch_game_exists_(a_id_game);
+	SET v_homebrew = IF(a_id_game LIKE '%\_', 1, 0);
+	SET v_result = a_id_game;
+
+	IF v_exists = 0 AND v_homebrew = 0 THEN
+		INSERT IGNORE INTO games
+			(id_game, title)
+		VALUES (a_id_game, IF(a_title = '', '(untitled homebrew)', a_title));
+	ELSEIF v_exists = 0 THEN
+		SET v_result = '';
+	ELSE
+		SET v_exists = EXISTS (
+			SELECT id_game
+			FROM games
+			WHERE id_game = a_id_game
+				AND (title LIKE '%?%' OR title = '' OR title = '(untitled homebrew)')
+				AND a_title NOT LIKE '%?%' AND a_title != ''
+				AND verified_title = 0
+		);
+
+		-- Some proxy has resulted in a lot of ?s for Unicode chars.
+		-- Let's try to fix if possible.
+		IF v_exists = 1 THEN
+			UPDATE games
+			SET title = a_title
+			WHERE id_game = a_id_game
+				AND (title LIKE '%?%' OR title = '' OR title = '(untitled homebrew)')
+				AND verified_title = 0;
+		END IF;
+	END IF;
+
+	SELECT v_result;
+END//
+
+DROP PROCEDURE IF EXISTS report_message_hit//
+CREATE PROCEDURE report_message_hit (
+	a_id_msg int(10) unsigned,
+	a_id_version int(10) unsigned,
+	a_id_gpu mediumint(8) unsigned,
+	a_id_cpu mediumint(8) unsigned,
+	a_id_platform mediumint(8) unsigned,
+	a_id_config int(10) unsigned
+)
+BEGIN
+	INSERT INTO report_message_versions
+		(id_msg, id_version, first_report, latest_report)
+	VALUES (a_id_msg, a_id_version, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = LEAST(65535, hits + 1);
+
+	INSERT INTO report_message_gpus
+		(id_msg, id_gpu, first_report, latest_report)
+	VALUES (a_id_msg, a_id_gpu, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = LEAST(65535, hits + 1);
+
+	INSERT INTO report_message_cpus
+		(id_msg, id_cpu, first_report, latest_report)
+	VALUES (a_id_msg, a_id_cpu, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = LEAST(65535, hits + 1);
+
+	INSERT INTO report_message_platforms
+		(id_msg, id_platform, first_report, latest_report)
+	VALUES (a_id_msg, a_id_platform, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = LEAST(65535, hits + 1);
+
+	INSERT INTO report_message_configs
+		(id_msg, id_config, first_report, latest_report)
+	VALUES (a_id_msg, a_id_config, NOW(), NOW())
+		ON DUPLICATE KEY UPDATE
+			latest_report = NOW(),
+			hits = LEAST(65535, hits + 1);
+END//
+delimiter ;
