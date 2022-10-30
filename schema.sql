@@ -1760,3 +1760,76 @@ BEGIN
 			hits = LEAST(65535, hits + 1);
 END//
 delimiter ;
+
+CREATE TABLE config_data (
+	id_config_data mediumint(8) unsigned NOT NULL auto_increment,
+	value varchar(255) CHARACTER SET latin1 NOT NULL,
+	PRIMARY KEY (id_config_data),
+	UNIQUE KEY value (value)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+delimiter //
+CREATE FUNCTION fetch_config_data_ (
+	a_value varchar(255) CHARACTER SET latin1
+) RETURNS mediumint(8) unsigned READS SQL DATA
+BEGIN
+	RETURN (
+		SELECT id_config_data
+		FROM config_data
+		WHERE value = a_value
+		LIMIT 1
+	);
+END//
+
+DROP PROCEDURE IF EXISTS set_config_value//
+CREATE PROCEDURE set_config_value (
+	a_id_config int(10) unsigned,
+	a_key varchar(64) CHARACTER SET latin1,
+	a_value varchar(255) CHARACTER SET latin1
+)
+BEGIN
+	DECLARE v_id_config_setting mediumint(8) unsigned;
+	DECLARE v_id_config_data mediumint(8) unsigned;
+
+	SET v_id_config_setting = fetch_config_setting_(a_key);
+	IF v_id_config_setting IS NULL THEN
+		INSERT IGNORE INTO config_settings
+			(title)
+		VALUES (a_key);
+
+		-- Re-select in case someone else inserted.
+		SET v_id_config_setting = fetch_config_setting_(a_key);
+	END IF;
+
+	SET v_id_config_data = fetch_config_data_(a_value);
+	IF v_id_config_data IS NULL THEN
+		INSERT IGNORE INTO config_data
+			(value)
+		VALUES (a_value);
+
+		-- Re-select in case someone else inserted.
+		SET v_id_config_data = fetch_config_data_(a_value);
+	END IF;
+
+	INSERT IGNORE INTO config_values
+		(id_config, id_config_setting, id_config_data)
+	VALUES (a_id_config, v_id_config_setting, v_id_config_data);
+
+	SELECT v_id_config_setting;
+END//
+delimiter ;
+
+ALTER TABLE config_values
+ADD COLUMN id_config_data mediumint(8) unsigned NOT NULL;
+
+INSERT INTO config_data
+	(value)
+SELECT DISTINCT value
+FROM config_values;
+
+UPDATE config_values AS cv
+	INNER JOIN config_data AS cd USING (value)
+SET cv.id_config_data = cd.id_config_data;
+
+ALTER TABLE config_values
+DROP COLUMN value;
