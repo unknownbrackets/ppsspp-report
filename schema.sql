@@ -1833,3 +1833,71 @@ SET cv.id_config_data = cd.id_config_data;
 
 ALTER TABLE config_values
 DROP COLUMN value;
+
+ALTER TABLE games
+ADD COLUMN module_name varchar(32) NOT NULL DEFAULT '',
+ADD COLUMN module_crc int(10) unsigned NOT NULL DEFAULT 0;
+
+delimiter //
+DROP PROCEDURE IF EXISTS create_game_crc//
+CREATE PROCEDURE create_game_crc (
+	a_id_game char(18) CHARACTER SET latin1,
+	a_title varchar(255) CHARACTER SET utf8mb4,
+	a_module_name varchar(32),
+	a_module_crc int(10) unsigned
+)
+BEGIN
+	DECLARE v_exists tinyint(1);
+	DECLARE v_update_module tinyint(1);
+	DECLARE v_homebrew tinyint(1);
+	DECLARE v_result varchar(18) CHARACTER SET latin1;
+
+	SET v_exists = fetch_game_exists_(a_id_game);
+	SET v_homebrew = IF(a_id_game LIKE '%\_', 1, 0);
+	SET v_result = a_id_game;
+
+	IF v_exists = 0 AND v_homebrew = 0 THEN
+		INSERT IGNORE INTO games
+			(id_game, title, module_name, module_crc)
+		VALUES (a_id_game, IF(a_title = '', '(untitled homebrew)', a_title), a_module_name, a_module_crc);
+	ELSEIF v_exists = 0 THEN
+		SET v_result = '';
+	ELSE
+		SET v_update_module = EXISTS (
+			SELECT id_game
+			FROM games
+			WHERE id_game = a_id_game
+				AND module_name = ''
+				AND module_crc = 0
+		);
+
+		IF v_update_module = 1 AND a_module_crc != 0 THEN
+			UPDATE games
+			SET module_name = a_module_name,
+				module_crc = a_module_crc
+			WHERE id_game = a_id_game;
+		END IF;
+
+		SET v_exists = EXISTS (
+			SELECT id_game
+			FROM games
+			WHERE id_game = a_id_game
+				AND (title LIKE '%?%' OR title = '' OR title = '(untitled homebrew)')
+				AND a_title NOT LIKE '%?%' AND a_title != ''
+				AND verified_title = 0
+		);
+
+		-- Some proxy has resulted in a lot of ?s for Unicode chars.
+		-- Let's try to fix if possible.
+		IF v_exists = 1 THEN
+			UPDATE games
+			SET title = a_title
+			WHERE id_game = a_id_game
+				AND (title LIKE '%?%' OR title = '' OR title = '(untitled homebrew)')
+				AND verified_title = 0;
+		END IF;
+	END IF;
+
+	SELECT v_result;
+END//
+delimiter ;
